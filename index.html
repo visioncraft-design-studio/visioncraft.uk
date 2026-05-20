@@ -1,0 +1,3177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VisionCraft Design Studio</title>
+    <meta name="description"
+          content="VisionCraft Design Studio helps businesses present spaces through VR walkthroughs, 360 virtual tours, and cinematic animation." />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css">
+    <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #f3f1ed;
+            --surface: #fbfaf7;
+            --surface-2: #f7f4ef;
+            --ink: #111111;
+            --text: #222222;
+            --muted: #6a6863;
+            --line: #d8d3cb;
+            --line-strong: #bdb7ae;
+            --max: 1500px;
+            --frame-max: 1880px;
+            --radius: 26px;
+            --shadow: 0 16px 40px rgba(0, 0, 0, 0.05);
+            --shadow-strong: 0 20px 48px rgba(0, 0, 0, 0.12);
+            --ease: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+            --header-offset: 68px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: var(--header-offset);
+        }
+
+        html,
+        body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        img,
+        video {
+            display: block;
+            max-width: 100%;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: min(calc(100% - 44px), var(--max));
+            margin: 0 auto;
+        }
+
+        .full-bleed-shell {
+            width: min(calc(100vw - 20px), var(--frame-max));
+            margin: 0 auto;
+        }
+
+        .section,
+        .opening-section,
+        .panorama-section,
+        .wallpaper-section {
+            scroll-margin-top: 0;
+        }
+
+        .section {
+            padding: 46px 0 84px;
+        }
+
+        .eyebrow {
+            margin: 0 0 14px;
+            font-size: 0.78rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .section-anchor {
+            scroll-margin-top: calc(var(--header-offset) - 18px);
+        }
+
+        .section-anchor-work {
+            scroll-margin-top: -42px;
+        }
+
+        .section-anchor-contact {
+            scroll-margin-top: -42px;
+        }
+
+         h1,
+        h2,
+        h3 {
+            margin: 0 0 14px;
+            color: var(--ink);
+            font-family: "DM Serif Display", Georgia, serif;
+            letter-spacing: -0.03em;
+            line-height: 1.06;
+            font-weight: 400;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 6vw, 5.7rem);
+            max-width: 920px;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3.35rem);
+            max-width: 920px;
+        }
+
+        h3 {
+            font-size: 1.14rem;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            max-width: 760px;
+            font-size: 1rem;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 120;
+            background: rgba(243, 241, 237, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+        }
+
+        .nav {
+            min-height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 12px 0;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .brand-logo {
+            width: 230px;
+            height: auto;
+            display: block;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .nav-links a {
+                font-size: 0.95rem;
+                color: #333333;
+                transition: opacity 0.18s ease;
+            }
+
+                .nav-links a:hover,
+                .footer-links a:hover {
+                    opacity: 0.65;
+                }
+
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 20px;
+            border-radius: 999px;
+            border: 1px solid var(--ink);
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+        .btn-dark {
+            background: var(--ink);
+            color: #ffffff;
+        }
+
+        .btn-dark:hover {
+                background: #262626;
+                color: #ffffff;
+            }
+
+        .btn-light {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .opening-section {
+            padding: 22px 0 24px;
+        }
+
+        .media-frame {
+            position: relative;
+            width: 100%;
+            min-height: clamp(420px, 78vh, 920px);
+            border-radius: 34px;
+            overflow: hidden;
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            box-shadow: var(--shadow-strong);
+            background: #b4aea6;
+        }
+
+        .panorama-frame::before {
+            content: "";
+            position: absolute;
+            inset: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.42);
+            border-radius: 28px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .panorama-frame {
+            width: min(100%, 1500px);
+            margin: 0 auto;
+        }
+
+        .media-fill {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .opening-video::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.06), transparent 34%), linear-gradient(to top, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.05) 38%, rgba(0, 0, 0, 0.18));
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .center-brand-plate {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(27vw, 300px);
+            height: min(8.5vw, 88px);
+            min-height: 72px;
+            background: rgba(247, 244, 239, 0.46);
+            backdrop-filter: blur(10px) saturate(1.02);
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            border-radius: 18px;
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+            z-index: 2;
+        }
+
+        .center-brand {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(22vw, 235px);
+            z-index: 3;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.8));
+            opacity: 0.96;
+        }
+
+        .frame-panel {
+            position: absolute;
+            left: 24px;
+            right: 24px;
+            bottom: 24px;
+            z-index: 4;
+            background: rgba(251, 250, 247, 0.9);
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            border-radius: 22px;
+            padding: 18px 22px;
+            box-shadow: var(--shadow);
+        }
+
+            .frame-panel strong {
+                display: block;
+                font-size: 0.92rem;
+                color: var(--ink);
+                margin-bottom: 4px;
+            }
+
+            .frame-panel span {
+                display: block;
+                font-size: 0.95rem;
+                color: var(--muted);
+            }
+
+        .intro-band {
+            padding: 34px 0 18px;
+        }
+
+            .intro-band h1 {
+                max-width: 930px;
+                line-height: 0.94;
+                letter-spacing: -0.06em;
+            }
+
+        .hero-note {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .panorama-section {
+            padding: 14px 0 68px;
+            scroll-margin-top: -70px;
+        }
+
+        .panorama-head {
+            padding-bottom: 18px;
+        }
+
+        .panorama-frame::before {
+            content: "";
+            position: absolute;
+            inset: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.42);
+            border-radius: 28px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        #hero-panorama {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .panorama-mobile-launch {
+            position: absolute;
+            inset: 0;
+            border: 0;
+            padding: 0;
+            margin: 0;
+            background: #d9d3cb;
+            border-radius: inherit;
+            overflow: hidden;
+            display: none;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .panorama-mobile-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .panorama-mobile-launch::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(17, 17, 17, 0.26), rgba(17, 17, 17, 0.04) 42%, rgba(17, 17, 17, 0.18));
+        }
+
+        .panorama-mobile-launch-copy {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: 14px;
+            z-index: 1;
+            display: grid;
+            gap: 4px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(251, 250, 247, 0.9);
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            box-shadow: var(--shadow);
+            text-align: left;
+        }
+
+            .panorama-mobile-launch-copy strong {
+                font-size: 0.92rem;
+                color: var(--ink);
+            }
+
+            .panorama-mobile-launch-copy span {
+                font-size: 0.9rem;
+                color: var(--muted);
+            }
+
+        .panorama-mobile-launch.is-hidden {
+            display: none !important;
+        }
+
+        .hero-panorama-nav {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .hero-panorama-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 68px;
+            height: 68px;
+            border-radius: 999px;
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            background: rgba(251, 250, 247, 0.9);
+            box-shadow: var(--shadow);
+            color: var(--ink);
+            font-size: 2rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: transform 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+        }
+
+            .hero-panorama-arrow:hover {
+                transform: translateY(-50%) scale(1.04);
+                background: rgba(255, 255, 255, 0.97);
+            }
+
+            .hero-panorama-arrow:disabled {
+                opacity: 0.42;
+                cursor: default;
+                transform: translateY(-50%);
+            }
+
+        .hero-panorama-arrow-left {
+            left: 18px;
+        }
+
+        .hero-panorama-arrow-right {
+            right: 18px;
+        }
+
+        .pnlm-controls-container,
+        .pnlm-about-msg,
+        .pnlm-compass,
+        .pnlm-load-box,
+        .pnlm-zoom-controls {
+            display: none !important;
+        }
+        .pnlm-hotspot-base.vcds-floor-hotspot {
+            width: 46px !important;
+            height: 46px !important;
+            border-radius: 999px;
+            background: rgba(251, 250, 247, 0.92) !important;
+            background-image: none !important;
+            border: 1px solid rgba(17, 17, 17, 0.14);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+            cursor: pointer;
+        }
+
+            .pnlm-hotspot-base.vcds-floor-hotspot::before {
+                content: "";
+                position: absolute;
+                inset: 13px;
+                border-radius: 999px;
+                background: #111111;
+            }
+
+        .pnlm-hotspot-base.vcds-back-hotspot {
+            width: 42px !important;
+            height: 42px !important;
+            border-radius: 999px;
+            background: rgba(17, 17, 17, 0.88) !important;
+            background-image: none !important;
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+            cursor: pointer;
+        }
+
+            .pnlm-hotspot-base.vcds-back-hotspot::before {
+                content: "←";
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                font-size: 22px;
+                font-weight: 600;
+                line-height: 1;
+            }
+
+        .intro-grid,
+        .process-grid,
+        .contact-grid,
+        .about-grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .intro-grid {
+            grid-template-columns: 1fr;
+            align-items: start;
+            gap: 16px;
+        }
+
+        .intro-side {
+            padding-top: 0;
+            border-top: 0;
+            max-width: 540px;
+        }
+
+            .intro-side p {
+                max-width: 480px;
+                margin-bottom: 10px;
+            }
+
+        .services-wrap {
+            border-top: 1px solid var(--line-strong);
+            margin-top: 28px;
+        }
+
+        .service-row {
+            display: grid;
+            grid-template-columns: 0.95fr 2.05fr;
+            gap: 34px;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+            .service-row .service-title {
+                color: var(--ink);
+                font-size: 1.06rem;
+                font-weight: 600;
+                letter-spacing: -0.03em;
+            }
+
+            .service-row p {
+                max-width: none;
+                margin: 0;
+            }
+
+        .section-work {
+            padding-top: 34px;
+            padding-bottom: 82px;
+        }
+
+            .section-work h2 {
+                max-width: 780px;
+                font-size: clamp(1.9rem, 3vw, 2.75rem);
+            }
+
+        .work-showcase {
+            margin-top: 22px;
+            display: grid;
+            gap: 24px;
+            grid-template-columns: 1fr;
+        }
+
+        .work-card {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            transition: flex-grow var(--ease), flex-basis var(--ease), transform 260ms ease, opacity 260ms ease;
+            outline: none;
+        }
+
+            .work-card:focus-visible .work-thumb {
+                box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.18);
+            }
+
+        .work-thumb {
+            position: relative;
+            aspect-ratio: 4 / 4.3;
+            overflow: hidden;
+            border-radius: 118px 118px 18px 18px;
+            border: 1px solid rgba(17, 17, 17, 0.1);
+            background: #dfdbd4;
+            box-shadow: var(--shadow);
+            transition: border-color 260ms ease, box-shadow 260ms ease, transform 260ms ease;
+        }
+
+            .work-thumb::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to top, rgba(17, 17, 17, 0.06), transparent 40%);
+                pointer-events: none;
+            }
+
+            .work-thumb video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                background: #d8d3cb;
+                opacity: 0;
+                transition: opacity 220ms ease;
+            }
+
+            .work-thumb.is-ready video {
+                opacity: 1;
+            }
+
+            .work-thumb.is-loading::before,
+            .work-thumb.is-ready::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, rgba(17,17,17,0.03), rgba(17,17,17,0.08));
+                pointer-events: none;
+                z-index: 1;
+                transition: opacity 220ms ease;
+            }
+
+            .work-thumb.is-ready::before {
+                opacity: 0;
+            }
+
+        .work-play-toggle {
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            z-index: 4;
+            width: 52px;
+            height: 52px;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(17, 17, 17, 0.88);
+            color: #ffffff;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            line-height: 1;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+        }
+
+            .work-play-toggle.is-playing {
+                background: rgba(17, 17, 17, 0.72);
+            }
+
+        @media (max-width: 760px) {
+            .work-play-toggle {
+                display: inline-flex;
+            }
+        }
+
+        .work-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin-top: 12px;
+        }
+
+        .work-card h3 {
+            margin: 7px 0 5px;
+            font-size: 1.08rem;
+        }
+
+        .wallpaper-section {
+            position: relative;
+            padding: 78px 0 88px;
+            color: #ffffff;
+            overflow: hidden;
+            background: #101010;
+        }
+
+        .wallpaper-bg {
+            position: absolute;
+            inset: -8%;
+            background-position: center;
+            background-size: cover;
+            filter: blur(34px) saturate(1.02);
+            transform: scale(1.08);
+            opacity: 0.42;
+            will-change: transform, opacity;
+        }
+
+        .wallpaper-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 38%), linear-gradient(to right, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0.26) 18%, rgba(0, 0, 0, 0.26) 82%, rgba(0, 0, 0, 0.88)), linear-gradient(to bottom, rgba(0, 0, 0, 0.86), rgba(0, 0, 0, 0.36) 24%, rgba(0, 0, 0, 0.44) 76%, rgba(0, 0, 0, 0.88));
+        }
+
+        .wallpaper-inner {
+            position: relative;
+            z-index: 2;
+            width: min(100%, 1320px);
+            margin: 0 auto;
+        }
+
+        .wallpaper-eyebrow {
+            color: rgba(255, 255, 255, 0.88) !important;
+            text-align: center;
+        }
+
+        .wallpaper-title {
+            max-width: 700px;
+            margin: 0 0 16px;
+            font-size: clamp(1.85rem, 2.8vw, 2.75rem);
+            line-height: 1.05;
+            color: #ffffff !important;
+            text-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .wallpaper-dots-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .wallpaper-dots {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            width: 118px;
+            min-width: 118px;
+        }
+
+        .wallpaper-count {
+            min-width: 56px;
+            font-size: 0.92rem;
+            color: rgba(255, 255, 255, 0.78);
+            text-align: left;
+            letter-spacing: 0.02em;
+        }
+
+        .wallpaper-nav-btn {
+            width: 26px;
+            height: 26px;
+            padding: 0;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        }
+
+            .wallpaper-nav-btn:hover {
+                transform: scale(1.06);
+                background: rgba(255, 255, 255, 0.16);
+                border-color: rgba(255, 255, 255, 0.56);
+            }
+
+            .wallpaper-nav-btn:disabled {
+                opacity: 0.42;
+                cursor: default;
+                transform: none;
+            }
+
+        .wallpaper-dot {
+            width: 14px;
+            height: 14px;
+            padding: 0;
+            border-radius: 999px;
+            border: 2px solid rgba(255, 255, 255, 0.72);
+            background: transparent;
+            cursor: pointer;
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        }
+
+            .wallpaper-dot:hover {
+                transform: scale(1.08);
+            }
+
+            .wallpaper-dot.is-active {
+                background: #ffffff;
+                border-color: #ffffff;
+            }
+
+        .wallpaper-stage {
+            position: relative;
+            height: clamp(340px, 31vw, 500px);
+            margin-top: 6px;
+            touch-action: pan-y;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            --wallpaper-drag: 0px;
+            perspective: 1800px;
+            perspective-origin: center center;
+            transform-style: preserve-3d;
+        }
+
+            .wallpaper-stage.is-dragging {
+                cursor: grabbing;
+            }
+
+                .wallpaper-stage.is-dragging .wallpaper-card {
+                    transition: none;
+                }
+
+        .wallpaper-card {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: min(39vw, 680px);
+            height: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
+            opacity: 0;
+            transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), opacity 140ms ease;
+            will-change: transform, opacity;
+        }
+
+            .wallpaper-card img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                user-select: none;
+                -webkit-user-select: none;
+                -webkit-user-drag: none;
+                pointer-events: none;
+            }
+
+            .wallpaper-card::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.34), transparent 44%);
+                pointer-events: none;
+            }
+
+            .wallpaper-card.is-center {
+                transform: translateX(calc(-50% + var(--wallpaper-drag))) scale(1);
+                opacity: 1;
+                z-index: 5;
+            }
+
+            .wallpaper-card.is-left {
+                transform: translateX(calc(-50% - 24vw + var(--wallpaper-drag))) scale(0.78);
+                opacity: 0.9;
+                z-index: 4;
+            }
+
+            .wallpaper-card.is-right {
+                transform: translateX(calc(-50% + 24vw + var(--wallpaper-drag))) scale(0.78);
+                opacity: 0.9;
+                z-index: 4;
+            }
+
+            .wallpaper-card.is-far-left {
+                transform: translateX(calc(-50% - 39vw + var(--wallpaper-drag))) scale(0.58);
+                opacity: 0.16;
+                z-index: 2;
+            }
+
+            .wallpaper-card.is-far-right {
+                transform: translateX(calc(-50% + 39vw + var(--wallpaper-drag))) scale(0.58);
+                opacity: 0.16;
+                z-index: 2;
+            }
+
+            .wallpaper-card.is-hidden {
+                transform: translateX(calc(-50% + var(--wallpaper-drag))) scale(0.4);
+                opacity: 0;
+                z-index: 1;
+                pointer-events: none;
+            }
+
+        .wallpaper-copy {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .wallpaper-description {
+            max-width: 640px;
+            min-height: 44px;
+            font-size: 0.96rem;
+            color: rgba(255, 255, 255, 0.92);
+            margin: 0;
+        }
+
+        @media (max-width: 1050px) {
+            .wallpaper-stage {
+                height: 290px;
+            }
+
+            .wallpaper-card {
+                width: calc(100vw - 32px);
+                border-radius: 10px;
+            }
+
+                .wallpaper-card.is-left,
+                .wallpaper-card.is-right {
+                    transform: translateX(-50%) scale(1);
+                    opacity: 0;
+                    z-index: 1;
+                }
+
+                .wallpaper-card.is-far-left,
+                .wallpaper-card.is-far-right {
+                    opacity: 0;
+                }
+        }
+
+        @media (max-width: 760px) {
+            .wallpaper-section {
+                padding: 72px 0 82px;
+            }
+
+            .wallpaper-stage {
+                height: 300px;
+            }
+
+            .wallpaper-card {
+                width: calc(100vw - 32px);
+                border-radius: 10px;
+            }
+
+            .wallpaper-description {
+                font-size: 0.96rem;
+                min-height: 62px;
+            }
+
+            .wallpaper-nav-btn {
+                width: 24px;
+                height: 24px;
+                font-size: 0.76rem;
+            }
+        }
+
+        @media (max-width: 920px) {
+            .wallpaper-stage {
+                min-height: 380px;
+            }
+
+            .wallpaper-card {
+                width: min(320px, 74vw);
+            }
+
+                .wallpaper-card.is-left {
+                    transform: translateX(calc(-50% - 395px + var(--wallpaper-drag))) scale(0.8);
+                    opacity: 0.92;
+                    z-index: 4;
+                }
+
+                .wallpaper-card.is-right {
+                    transform: translateX(calc(-50% + 395px + var(--wallpaper-drag))) scale(0.8);
+                    opacity: 0.92;
+                    z-index: 4;
+                }
+
+                .wallpaper-card.is-far-left {
+                    transform: translateX(calc(-50% - 620px + var(--wallpaper-drag))) scale(0.64);
+                    opacity: 0.14;
+                    z-index: 2;
+                }
+
+                .wallpaper-card.is-far-right {
+                    transform: translateX(calc(-50% + 620px + var(--wallpaper-drag))) scale(0.64);
+                    opacity: 0.14;
+                    z-index: 2;
+                }
+        }
+
+        @media (max-width: 680px) {
+            .wallpaper-section {
+                padding: 84px 0 76px;
+            }
+
+            .wallpaper-dots-wrap {
+                gap: 10px;
+            }
+
+            .wallpaper-nav-btn {
+                width: 30px;
+                height: 30px;
+            }
+
+            .wallpaper-stage {
+                min-height: 320px;
+            }
+
+            .wallpaper-card {
+                width: min(260px, 76vw);
+            }
+
+                .wallpaper-card.is-left,
+                .wallpaper-card.is-right,
+                .wallpaper-card.is-far-left,
+                .wallpaper-card.is-far-right,
+                .wallpaper-card.is-hidden {
+                    display: none;
+                }
+
+                .wallpaper-card.is-center {
+                    transform: translateX(-50%) translateY(0) scale(1);
+                    opacity: 1;
+                    z-index: 3;
+                }
+        }
+
+        .process-grid {
+            grid-template-columns: repeat(4, 1fr);
+            margin-top: 28px;
+            border-top: 1px solid var(--line-strong);
+        }
+
+        .process-step {
+            padding: 24px 20px 0 0;
+        }
+
+        .step-illustration-box {
+            position: relative;
+            margin: 0 0 16px;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 18px;
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            background: linear-gradient(180deg, rgba(17,17,17,0.04), rgba(17,17,17,0.08));
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+            .step-illustration-box img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .step-illustration-label {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: 12px;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.02em;
+        }
+
+        .step-illustration-box.loaded .step-illustration-label {
+            display: none;
+        }
+
+        .process-step span {
+            display: block;
+            font-size: 0.78rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .process-grid.process-flip-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-top: 28px;
+            border-top: 0;
+            perspective: 1600px;
+        }
+
+        .process-flip-card {
+            position: relative;
+            min-height: 360px;
+            perspective: 1200px;
+            outline: none;
+        }
+
+        .process-flip-inner {
+            position: relative;
+            width: 100%;
+            min-height: 360px;
+            transform-style: preserve-3d;
+            transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .process-flip-card:hover .process-flip-inner,
+        .process-flip-card:focus .process-flip-inner,
+        .process-flip-card:focus-within .process-flip-inner {
+            transform: rotateY(180deg);
+        }
+
+        .process-flip-face {
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border: 1px solid rgba(17, 17, 17, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .process-flip-front {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: #111111;
+            color: #ffffff;
+        }
+
+            .process-flip-front::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: var(--process-img);
+                background-size: cover;
+                background-position: center;
+                opacity: 0.58;
+                transform: scale(1.02);
+            }
+
+            .process-flip-front::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.18));
+            }
+
+        .process-flip-front-content {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            justify-items: center;
+            gap: 16px;
+            padding: 24px;
+        }
+
+        .process-flip-logo-plate {
+            width: 96px;
+            height: 64px;
+            border-radius: 16px;
+            background: rgba(251, 250, 247, 0.84);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+            .process-flip-logo-plate img {
+                max-width: 72px;
+                max-height: 40px;
+                object-fit: contain;
+            }
+
+        .process-flip-front span {
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        .process-flip-front h3 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.8rem;
+            text-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+        }
+
+        .process-flip-back {
+            transform: rotateY(180deg);
+            background: #111111;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            border-color: rgba(189, 183, 174, 0.45);
+        }
+
+        .process-flip-back-content {
+            max-width: 310px;
+        }
+
+        .process-flip-back span {
+            display: block;
+            margin-bottom: 14px;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.68);
+        }
+
+        .process-flip-back h3 {
+            color: #ffffff;
+            font-size: 1.7rem;
+            margin-bottom: 14px;
+        }
+
+        .process-flip-back p {
+            color: rgba(255, 255, 255, 0.84);
+            margin: 0;
+            font-size: 0.98rem;
+        }
+
+        @media (max-width: 1050px) {
+            .process-grid.process-flip-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .process-grid.process-flip-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-flip-card,
+            .process-flip-inner {
+                min-height: 320px;
+            }
+        }
+
+        .about-grid {
+            grid-template-columns: 1fr 1fr;
+            align-items: start;
+            gap: 38px;
+            margin-top: 28px;
+        }
+
+        .about-panel {
+            background: var(--surface);
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            border-radius: var(--radius);
+            padding: 26px;
+            box-shadow: var(--shadow);
+        }
+
+            .about-panel p:last-child {
+                margin-bottom: 0;
+            }
+
+        .contact-grid {
+            grid-template-columns: 1.05fr 0.95fr;
+            margin-top: 28px;
+            align-items: start;
+        }
+
+        .contact-panel,
+        .contact-form {
+            background: var(--surface);
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            border-radius: var(--radius);
+            padding: 26px;
+            box-shadow: var(--shadow);
+        }
+
+        .contact-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+            .field label {
+                font-size: 0.92rem;
+                color: var(--ink);
+            }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            background: var(--surface-2);
+            color: var(--ink);
+            border-radius: 14px;
+            padding: 14px 15px;
+            font: inherit;
+            outline: none;
+        }
+
+            input:focus,
+            select:focus,
+            textarea:focus {
+                border-color: var(--line-strong);
+                background: #ffffff;
+            }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .contact-list {
+            display: grid;
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .contact-item {
+            padding: 14px 0;
+            border-top: 1px solid var(--line);
+        }
+
+            .contact-item:first-child {
+                border-top: 1px solid var(--line-strong);
+            }
+
+            .contact-item span {
+                display: block;
+                font-size: 0.78rem;
+                letter-spacing: 0.16em;
+                text-transform: uppercase;
+                color: var(--muted);
+                margin-bottom: 6px;
+            }
+
+        .footer {
+            padding: 26px 0 38px;
+            border-top: 1px solid rgba(17, 17, 17, 0.08);
+        }
+
+        .footer-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 22px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+            .footer-brand img {
+                width: 170px;
+                height: auto;
+            }
+
+            .footer-brand small {
+                max-width: 340px;
+                color: var(--muted);
+                display: block;
+            }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 20px;
+            color: var(--muted);
+            font-size: 0.94rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            width: 56px;
+            height: 56px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--ink);
+            color: #ffffff;
+            font-size: 1.4rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+            opacity: 0;
+            transform: translateY(10px) scale(0.96);
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease, background 0.18s ease;
+            z-index: 130;
+        }
+
+            .back-to-top.is-visible {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                pointer-events: auto;
+            }
+
+            .back-to-top:hover {
+                background: #262626;
+            }
+
+        @media (min-width: 1051px) {
+            .work-showcase {
+                display: flex;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .work-card {
+                flex: 1 1 0;
+            }
+
+            .work-showcase.is-interacting .work-card {
+                flex: 0.94 1 0;
+                opacity: 0.94;
+            }
+
+                .work-showcase.is-interacting .work-card.is-active {
+                    flex: 1.26 1 0;
+                    opacity: 1;
+                }
+
+                    .work-showcase.is-interacting .work-card.is-active .work-thumb {
+                        box-shadow: var(--shadow-strong);
+                        transform: translateY(-2px);
+                    }
+        }
+
+        @media (max-width: 1050px) {
+            .container {
+                width: min(calc(100% - 32px), var(--max));
+            }
+
+            .full-bleed-shell {
+                width: min(calc(100vw - 12px), var(--frame-max));
+            }
+
+            .media-frame {
+                min-height: clamp(360px, 64vh, 720px);
+                border-radius: 26px;
+            }
+
+            .center-brand-plate {
+                width: 112px;
+                min-height: 30px;
+                height: 30px;
+                border-radius: 8px;
+            }
+
+            .center-brand {
+                width: 80px;
+            }
+
+            .wallpaper-stage {
+                height: 290px;
+            }
+
+            .wallpaper-card {
+                width: calc(100vw - 32px);
+                border-radius: 10px;
+            }
+
+                .wallpaper-card.is-prev,
+                .wallpaper-card.is-next {
+                    transform: translateX(-50%) scale(1);
+                    opacity: 0;
+                    z-index: 1;
+                }
+
+                .wallpaper-card.is-far-left,
+                .wallpaper-card.is-far-right {
+                    opacity: 0;
+                }
+
+            .about-grid,
+            .contact-grid,
+            .process-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .process-step {
+                padding: 18px 0 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+                .process-step:last-child {
+                    border-bottom: 0;
+                }
+        }
+
+        @media (max-width: 760px) {
+            :root {
+                --header-offset: 72px;
+            }
+
+            .container {
+                width: min(calc(100% - 20px), var(--max));
+            }
+
+            .section {
+                padding: 68px 0;
+            }
+
+            .nav {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .nav-links {
+                gap: 14px;
+                justify-content: flex-start;
+            }
+
+            .brand-logo {
+                width: 180px;
+            }
+
+            .footer-brand {
+                gap: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+                .footer-brand img {
+                    width: 150px;
+                }
+
+            .media-frame {
+                min-height: 320px;
+                border-radius: 22px;
+            }
+
+            .center-brand-plate {
+                width: 112px;
+                min-height: 32px;
+                height: 32px;
+                border-radius: 8px;
+            }
+
+            .center-brand {
+                width: 78px;
+            }
+            
+            .panorama-mobile-launch {
+                display: block;
+            }
+
+                #hero-panorama.is-live + .panorama-mobile-launch,
+                .panorama-mobile-launch.is-hidden {
+                    display: none !important;
+                }
+
+            .frame-panel {
+                left: 14px;
+                right: 14px;
+                bottom: 14px;
+                padding: 14px 16px;
+                border-radius: 16px;
+            }
+
+            .hero-panorama-arrow {
+                width: 52px;
+                height: 52px;
+                font-size: 1.5rem;
+            }
+
+            .hero-panorama-arrow-left {
+                left: 12px;
+            }
+
+            .hero-panorama-arrow-right {
+                right: 12px;
+            }
+
+            .intro-band {
+                padding-top: 24px;
+            }
+
+                .intro-band h1 {
+                    font-size: clamp(2.3rem, 11vw, 4.3rem);
+                }
+
+            .wallpaper-section {
+                padding: 72px 0 82px;
+            }
+
+            .wallpaper-stage {
+                height: 300px;
+            }
+
+            .wallpaper-card {
+                width: calc(100vw - 32px);
+                border-radius: 10px;
+            }
+
+            .wallpaper-description {
+                font-size: 0.96rem;
+                min-height: 62px;
+            }
+
+            .back-to-top {
+                width: 52px;
+                height: 52px;
+                right: 14px;
+                bottom: 14px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .process-flip-front-content {
+                transition: opacity 180ms ease;
+            }
+
+            .process-flip-card:hover .process-flip-front-content,
+            .process-flip-card:focus .process-flip-front-content,
+            .process-flip-card:focus-within .process-flip-front-content {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
+        .panorama-support-note {
+            display: none;
+        }
+
+        @media (max-width: 760px) {
+            .panorama-support-note {
+                display: block;
+                width: min(calc(100% - 20px), var(--max));
+                margin: 14px auto 0;
+                color: var(--muted);
+                font-size: 0.82rem;
+                line-height: 1.5;
+                text-align: center;
+            }
+        }
+
+        /* Softer 360 panorama arrows */
+        .hero-panorama-arrow {
+            background: rgba(251, 250, 247, 0.60) !important;
+            color: #111111 !important;
+            border: 1px solid rgba(255, 255, 255, 0.42) !important;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12) !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+            .hero-panorama-arrow:hover {
+                background: rgba(251, 250, 247, 0.88) !important;
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16) !important;
+            }
+
+        /* Softer back-to-top button */
+        .back-to-top,
+        .scroll-to-top,
+        .scroll-top,
+        .go-top,
+        .to-top,
+        #backToTop,
+        #scrollTop,
+        #scrollToTop {
+            background: rgba(17, 17, 17, 0.55) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18) !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+            .back-to-top:hover,
+            .scroll-to-top:hover,
+            .scroll-top:hover,
+            .go-top:hover,
+            .to-top:hover,
+            #backToTop:hover,
+            #scrollTop:hover,
+            #scrollToTop:hover {
+                background: rgba(17, 17, 17, 0.84) !important;
+            }
+
+    </style>
+</head>
+<body>
+    <div id="top"></div>
+
+    <header class="site-header">
+        <div class="container nav">
+            <a href="#top" class="brand" aria-label="VisionCraft Design Studio home">
+                <img src="logo.png" alt="VisionCraft Design Studio logo" class="brand-logo" />
+            </a>
+
+            <nav class="nav-links" aria-label="Primary navigation">
+                <a href="#services">Services</a>
+                <a href="#work">Work</a>
+                <a href="#360-tour">360 Tour</a>
+                <a href="#process">Process</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </nav>
+
+            <a href="#contact" class="btn btn-dark">Contact Us</a>
+        </div>
+    </header>
+
+    <main id="home">
+        <section class="opening-section">
+            <div class="full-bleed-shell">
+                <div class="media-frame opening-video">
+                    <video class="media-fill" autoplay muted loop playsinline>
+                        <source src="media/opening-showreel.mp4" type="video/mp4" />
+                    </video>
+
+                    <div class="center-brand-plate" aria-hidden="true"></div>
+                    <img src="logo.png" alt="VisionCraft Design Studio" class="center-brand" />
+                </div>
+            </div>
+
+            <div class="container intro-band">
+                <p class="eyebrow">Immersive spatial presentation</p>
+                <h1>We elevate how spaces are experienced.</h1>
+                <p>
+                    VisionCraft Design Studio helps businesses present interiors, retail environments,
+                    and branded spaces through VR walkthroughs, 360 virtual tours, and cinematic animation.
+                </p>
+
+                <div class="btn-row">
+                    <a href="#contact" class="btn btn-dark">Send Us a Message</a>
+                    <a href="#work" class="btn btn-light">View Work</a>
+                </div>
+
+                <div class="hero-note">
+                    VR walkthroughs • 360 renders • cinematic animation • VR-ready business support
+                </div>
+            </div>
+        </section>
+
+        <section class="panorama-section" id="360-tour">
+            <div class="container panorama-head">
+                <p class="eyebrow">Interactive 360 window</p>
+                <h2>Explore a full-width 360 presentation inside a clean panoramic frame.</h2>
+            </div>
+
+            <div class="full-bleed-shell">
+                <div class="media-frame panorama-frame" aria-label="Interactive 360 panorama">
+                    <div id="hero-panorama"></div>
+
+                    <button class="panorama-mobile-launch" id="mobilePanoramaLaunch" type="button" aria-label="Start interactive 360">
+                        <img src="media/hero-panorama1-mobile.jpg?v=102" alt="" class="panorama-mobile-poster" />
+                        <span class="panorama-mobile-launch-copy">
+                            <strong>Tap to load 360</strong>
+                            <span>Drag to explore after it loads</span>
+                        </span>
+                    </button>
+
+                    <div class="hero-panorama-nav">
+                        <button class="hero-panorama-arrow hero-panorama-arrow-left" id="heroPrev" type="button" aria-label="Previous panorama">&#10094;</button>
+                        <button class="hero-panorama-arrow hero-panorama-arrow-right" id="heroNext" type="button" aria-label="Next panorama">&#10095;</button>
+                    </div>
+                </div>
+            </div>
+
+            <p class="panorama-support-note">
+                If this 360 window doesn’t work, please try a different browser. This browser may not support 360 viewing.
+            </p>
+
+            <div class="btn-row" style="justify-content: center; margin-top: 18px;">
+                <a href="tour-builder.html" class="btn btn-dark">
+                    Create your 360 tour now
+                </a>
+            </div>
+
+        </section>
+
+        <section class="section">
+            <div class="container intro-grid">
+                <div>
+                    <p class="eyebrow">What we do</p>
+                    <h2>Built for interior companies, retailers, event brands, and businesses that want spaces to feel real before they exist.</h2>
+                </div>
+
+                <div class="intro-side">
+                    <p>
+                        We help businesses move beyond static presentation by turning existing 3D scenes
+                        into immersive experiences that feel more visual, more understandable, and more memorable.
+                    </p>
+                    <p>
+                        The goal is not just to show a project. It is to help clients feel it.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="eyebrow section-anchor" id="services">Services</p>
+                <h2>Immersive tools for better presentation, stronger impact, and clearer understanding of space.</h2>
+
+                <div class="services-wrap">
+                    <div class="service-row">
+                        <div class="service-title">VR Walkthroughs</div>
+                        <p>
+                            We turn your existing 3D scenes into immersive walkthroughs that help clients
+                            explore a space with a stronger sense of scale, flow, and presence.
+                        </p>
+                    </div>
+
+                    <div class="service-row">
+                        <div class="service-title">360 Virtual Tours</div>
+                        <p>
+                            We create interactive 360 presentations that let viewers move through environments
+                            online in a simple and visually engaging way.
+                        </p>
+                    </div>
+
+                    <div class="service-row">
+                        <div class="service-title">Cinematic Animation</div>
+                        <p>
+                            We produce polished walkthrough animations designed to present interiors, retail
+                            concepts, and branded spaces with more atmosphere and clarity.
+                        </p>
+                    </div>
+
+                    <div class="service-row">
+                        <div class="service-title">VR Business Support</div>
+                        <p>
+                            We help businesses get ready to use VR in a practical way, including guidance,
+                            tutorials, and presentation support for client-facing use.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section-work">
+            <div class="container">
+                <p class="eyebrow section-anchor section-anchor-work" id="work">Selected work</p>
+                <h2>Immersive presentations created to make spaces easier to understand and harder to forget.</h2>
+
+                <div class="work-showcase" id="workShowcase">
+                    <article class="work-card" tabindex="0" data-video-card>
+                        <div class="work-thumb">
+                            <video muted playsinline loop preload="none" aria-label="Retail concept presentation preview" data-mobile-video>
+                                <source data-src="media/work-1.mp4" type="video/mp4" />
+                            </video>
+                        </div>
+                        <div class="work-meta">
+                            <span>VR retail walkthrough</span>
+                            <span>Retail</span>
+                        </div>
+                        <h3>VR retail walkthrough</h3>
+                        <p>An immersive retail walkthrough that helps clients understand the layout, atmosphere, customer flow, and movement through the space before it is built.</p>
+                    </article>
+
+                    <article class="work-card" tabindex="0" data-video-card>
+                        <div class="work-thumb">
+                            <video muted playsinline loop preload="none" aria-label="Interactive kitchen tour preview" data-mobile-video>
+                                <source data-src="media/work-2.mp4" type="video/mp4" />
+                            </video>
+                        </div>
+                        <div class="work-meta">
+                            <span>Kitchen VR walkthrough</span>
+                            <span>Interactive VR</span>
+                        </div>
+                        <h3>Interactive kitchen VR walkthrough</h3>
+                        <p>An interactive VR kitchen walkthrough that lets customers explore the design, understand the space, and experience the final atmosphere in a more realistic way.</p>
+                    </article>
+
+                    <article class="work-card" tabindex="0" data-video-card>
+                        <div class="work-thumb">
+                            <video muted playsinline loop preload="none" aria-label="Branded spatial film preview" data-mobile-video>
+                                <source data-src="media/work-3.mp4" type="video/mp4" />
+                            </video>
+                        </div>
+                        <div class="work-meta">
+                            <span>Cinematic walkthrough</span>
+                            <span>Custom animation</span>
+                        </div>
+                        <h3>Cinematic video walkthrough</h3>
+                        <p>A cinematic animation tailored to the project’s needs, bringing still images and spatial concepts to life through movement, atmosphere, and storytelling.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="wallpaper-section" id="wallpapers">
+            <div class="wallpaper-bg" id="wallpaperBg"></div>
+            <div class="wallpaper-vignette"></div>
+
+            <div class="container wallpaper-inner">
+                <p class="eyebrow wallpaper-eyebrow">WALLPAPER_SHOWCASE_LABEL_PLACEHOLDER</p>
+                <h2 class="wallpaper-title">WALLPAPER_SHOWCASE_TITLE_PLACEHOLDER.</h2>
+
+                <div class="wallpaper-dots-wrap">
+                    <button class="wallpaper-nav-btn" id="wallpaperPrev" type="button" aria-label="Previous wallpaper">&#10094;</button>
+                    <div class="wallpaper-dots" id="wallpaperDots"></div>
+                    <button class="wallpaper-nav-btn" id="wallpaperNext" type="button" aria-label="Next wallpaper">&#10095;</button>
+                    <span class="wallpaper-count" id="wallpaperCount"></span>
+                </div>
+
+                <div class="wallpaper-stage" id="wallpaperStage"></div>
+
+                <div class="wallpaper-copy">
+                    <p class="wallpaper-description" id="wallpaperDescription"></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="eyebrow section-anchor" id="process">Process</p>
+                <h2>A clear workflow from scene to final immersive presentation.</h2>
+
+                <div class="process-grid process-flip-grid">
+                    <article class="process-flip-card" tabindex="0">
+                        <div class="process-flip-inner">
+                            <div class="process-flip-face process-flip-front" style="--process-img: url('media/process-1.jpg');">
+                                <div class="process-flip-front-content">
+                                    <span>Step 01</span>
+                                    <h3>Review</h3>
+                                </div>
+                            </div>
+
+                            <div class="process-flip-face process-flip-back">
+                                <div class="process-flip-back-content">
+                                    <span>Step 01</span>
+                                    <h3>Review</h3>
+                                    <p>We look at your scene, your goals, and the type of output that fits your project best.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="process-flip-card" tabindex="0">
+                        <div class="process-flip-inner">
+                            <div class="process-flip-face process-flip-front" style="--process-img: url('media/process-2.jpg');">
+                                <div class="process-flip-front-content">
+                                    <span>Step 02</span>
+                                    <h3>Prepare</h3>
+                                </div>
+                            </div>
+
+                            <div class="process-flip-face process-flip-back">
+                                <div class="process-flip-back-content">
+                                    <span>Step 02</span>
+                                    <h3>Prepare</h3>
+                                    <p>We organize the content and set up the production approach for VR, 360, or animation.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="process-flip-card" tabindex="0">
+                        <div class="process-flip-inner">
+                            <div class="process-flip-face process-flip-front" style="--process-img: url('media/process-3.jpg');">
+                                <div class="process-flip-front-content">
+                                    <span>Step 03</span>
+                                    <h3>Develop</h3>
+                                </div>
+                            </div>
+
+                            <div class="process-flip-face process-flip-back">
+                                <div class="process-flip-back-content">
+                                    <span>Step 03</span>
+                                    <h3>Develop</h3>
+                                    <p>We refine visuals, movement, interaction, and performance to create a clean final experience.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="process-flip-card" tabindex="0">
+                        <div class="process-flip-inner">
+                            <div class="process-flip-face process-flip-front" style="--process-img: url('media/process-4.jpg');">
+                                <div class="process-flip-front-content">
+                                    <span>Step 04</span>
+                                    <h3>Deliver</h3>
+                                </div>
+                            </div>
+
+                            <div class="process-flip-face process-flip-back">
+                                <div class="process-flip-back-content">
+                                    <span>Step 04</span>
+                                    <h3>Deliver</h3>
+                                    <p>You receive a presentation-ready result built for your intended platform and use case.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="eyebrow section-anchor" id="about">About</p>
+                <h2>Creative, visual, and business-ready.</h2>
+
+                <div class="about-grid">
+                    <div class="about-panel">
+                        <p>
+                            VisionCraft Design Studio brings together interior understanding, immersive
+                            presentation, and visual storytelling to help businesses show spaces in a stronger way.
+                        </p>
+                        <p>
+                            Our approach is clean, modern, and visual-first. We focus on making ideas easier
+                            to experience, easier to understand, and more impressive to present.
+                        </p>
+                    </div>
+
+                    <div class="about-panel">
+                        <p>
+                            We work best with businesses that already have a concept, scene, or design direction
+                            and want to turn it into something more immersive for clients, teams, or customers.
+                        </p>
+                        <p>
+                            The result is not just prettier content. It is a better way to communicate space.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="eyebrow section-anchor section-anchor-contact" id="contact">Contact</p>
+                <h2>Let’s talk about your project.</h2>
+                <p>
+                    Tell us what kind of scene you have, what output you need, and how you want people to experience it.
+                </p>
+
+                <div class="contact-grid">
+                    <form class="contact-form" id="contactForm">
+                        <div class="field">
+                            <label for="name">Name</label>
+                            <input id="name" name="name" type="text" placeholder="Your name" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="email" placeholder="you@example.com" required />
+                        </div>
+
+                        <div class="field">
+                            <label for="company">Company</label>
+                            <input id="company" name="company" type="text" placeholder="Company name" />
+                        </div>
+
+                        <div class="field">
+                            <label for="project-type">Project type</label>
+                            <select id="project-type" name="project-type">
+                                <option>VR Walkthrough</option>
+                                <option>360 Virtual Tour</option>
+                                <option>Cinematic Animation</option>
+                                <option>VR Business Support</option>
+                                <option>Not sure yet</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" placeholder="Tell us what you have and what you want to create."></textarea>
+                        </div>
+
+                        <p id="contactStatus" style="display:none; margin: 4px 0 0;"></p>
+                        <button type="submit" class="btn btn-dark">Send Message</button>
+                    </form>
+
+                    <div class="contact-panel">
+                        <h3>Project inquiries</h3>
+                        <p>
+                            The easiest way to start is to send us a short message with your scene type,
+                            target platform, and what kind of experience you want to create.
+                        </p>
+
+                        <div class="contact-list">
+                            <div class="contact-item">
+                                <span>Business phone</span>
+                                +44 7931 396221
+                            </div>
+
+                            <div class="contact-item">
+                                <span>WhatsApp</span>
+                                <a href="https://wa.me/447931396221" target="_blank" rel="noopener noreferrer">+44 7931 396221</a>
+                            </div>
+
+                            <div class="contact-item">
+                                <span>Email</span>
+                                <a href="mailto:hello@visioncraft.uk">hello@visioncraft.uk</a>
+                            </div>
+
+                            <div class="contact-item">
+                                <span>Typical starting points</span>
+                                Existing 3D scene ready for conversion<br />
+                                Need a cinematic walkthrough<br />
+                                Need a 360 presentation<br />
+                                Want help preparing for VR use
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="#top" aria-label="VisionCraft Design Studio home">
+                    <img src="logo.png" alt="VisionCraft Design Studio logo" />
+                </a>
+                <small>Immersive presentation for interior, retail, and spatial experiences.</small>
+            </div>
+
+            <div class="footer-links">
+                <a href="#services">Services</a>
+                <a href="#work">Work</a>
+                <a href="#process">Process</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">&#8593;</button>
+
+    <script>
+
+        (function () {
+        const desktopQuery = window.matchMedia("(min-width: 1051px)");
+        const showcase = document.getElementById("workShowcase");
+        if (!showcase) return;
+
+        const cards = Array.from(showcase.querySelectorAll("[data-video-card]"));
+
+        function getVideo(card) {
+        return card.querySelector("video");
+        }
+
+        function getThumb(card) {
+        return card.querySelector(".work-thumb");
+        }
+
+        function getButton(card) {
+        return card.querySelector(".work-play-toggle");
+        }
+
+        function ensureVideoSource(video) {
+        if (!video) return;
+        const source = video.querySelector("source");
+        if (!source) return;
+
+        if (!source.getAttribute("src")) {
+        const realSrc = source.getAttribute("data-src");
+        if (realSrc) {
+        source.setAttribute("src", realSrc);
+        video.load();
+        }
+        }
+        }
+
+        function markReady(card) {
+        const thumb = getThumb(card);
+        if (thumb) {
+        thumb.classList.remove("is-loading");
+        thumb.classList.add("is-ready");
+        }
+        }
+
+        function markLoading(card) {
+        const thumb = getThumb(card);
+        if (thumb) {
+        thumb.classList.add("is-loading");
+        }
+        }
+
+        function pauseAndReset(video) {
+        if (!video) return;
+        video.pause();
+        }
+
+        function primeFrame(video, card) {
+        if (!video || video.dataset.framePrimed === "true") return;
+        video.dataset.framePrimed = "true";
+
+        const onLoaded = () => {
+        markReady(card);
+        try {
+        video.currentTime = 0.08;
+        } catch (error) {}
+        };
+
+        if (video.readyState >= 2) {
+        onLoaded();
+        } else {
+        video.addEventListener("loadeddata", onLoaded, { once: true });
+        }
+        }
+
+        function syncButton(card) {
+        const video = getVideo(card);
+        const button = getButton(card);
+        if (!video || !button) return;
+
+        const playing = !video.paused && !video.ended;
+        button.textContent = playing ? "❚❚" : "▶";
+        button.classList.toggle("is-playing", playing);
+        button.setAttribute("aria-label", playing ? "Pause video" : "Play video");
+        }
+
+        function syncAllButtons() {
+        cards.forEach(syncButton);
+        }
+
+        function pauseOtherVideos(activeCard) {
+        cards.forEach((card) => {
+        if (card === activeCard) return;
+        const otherVideo = getVideo(card);
+        if (otherVideo) {
+        otherVideo.pause();
+        }
+        syncButton(card);
+        });
+        }
+
+        function toggleCardVideo(card) {
+        const video = getVideo(card);
+        if (!video) return;
+
+        markLoading(card);
+        ensureVideoSource(video);
+        primeFrame(video, card);
+
+        if (video.paused) {
+        pauseOtherVideos(card);
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {});
+        }
+        } else {
+        video.pause();
+        }
+
+        syncAllButtons();
+        }
+
+        function clearActiveState() {
+        showcase.classList.remove("is-interacting");
+        cards.forEach((card) => {
+        card.classList.remove("is-active");
+        const video = getVideo(card);
+        if (desktopQuery.matches) {
+        pauseAndReset(video);
+        } else if (video) {
+        video.pause();
+        }
+        syncButton(card);
+        });
+        }
+
+        function activateCard(activeCard) {
+        if (!desktopQuery.matches) return;
+
+        showcase.classList.add("is-interacting");
+
+        cards.forEach((card) => {
+        const video = getVideo(card);
+        const isActive = card === activeCard;
+
+        card.classList.toggle("is-active", isActive);
+
+        if (isActive) {
+        if (video) {
+        markLoading(card);
+        ensureVideoSource(video);
+        primeFrame(video, card);
+        pauseOtherVideos(card);
+
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {});
+        }
+        }
+        } else {
+        pauseAndReset(video);
+        }
+
+        syncButton(card);
+        });
+        }
+
+        cards.forEach((card) => {
+        const video = getVideo(card);
+        const thumb = getThumb(card);
+        if (!video || !thumb) return;
+
+        let button = getButton(card);
+        if (!button) {
+        button = document.createElement("button");
+        button.type = "button";
+        button.className = "work-play-toggle";
+        button.textContent = "▶";
+        button.setAttribute("aria-label", "Play video");
+        thumb.appendChild(button);
+        }
+
+        video.addEventListener("loadeddata", () => {
+        markReady(card);
+        syncButton(card);
+        });
+
+        video.addEventListener("play", () => syncButton(card));
+        video.addEventListener("pause", () => syncButton(card));
+        video.addEventListener("ended", () => syncButton(card));
+
+        card.addEventListener("mouseenter", () => activateCard(card));
+        card.addEventListener("focusin", () => activateCard(card));
+
+        button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleCardVideo(card);
+        });
+
+        thumb.addEventListener("click", (event) => {
+        if (desktopQuery.matches) return;
+        if (event.target.closest(".work-play-toggle")) return;
+        toggleCardVideo(card);
+        });
+        });
+
+        showcase.addEventListener("mouseleave", clearActiveState);
+
+        showcase.addEventListener("focusout", () => {
+        requestAnimationFrame(() => {
+        if (!showcase.contains(document.activeElement)) {
+        clearActiveState();
+        }
+        });
+        });
+
+        const videoObserver = "IntersectionObserver" in window
+        ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+        const video = entry.target;
+        const card = video.closest("[data-video-card]");
+        if (!card) return;
+
+        if (entry.isIntersecting) {
+        markLoading(card);
+        ensureVideoSource(video);
+        primeFrame(video, card);
+        } else {
+        video.pause();
+        syncButton(card);
+        }
+        });
+        }, { threshold: 0.2, rootMargin: "120px 0px" })
+        : null;
+
+        cards.forEach((card) => {
+        const video = getVideo(card);
+        if (!video) return;
+
+        if (videoObserver) {
+        videoObserver.observe(video);
+        } else {
+        markLoading(card);
+        ensureVideoSource(video);
+        primeFrame(video, card);
+        }
+        });
+
+        window.addEventListener("resize", () => {
+        if (!desktopQuery.matches) {
+        cards.forEach((card) => {
+        const video = getVideo(card);
+        if (video) {
+        video.pause();
+        }
+        syncButton(card);
+        });
+        }
+        });
+
+        desktopQuery.addEventListener("change", () => {
+        cards.forEach((card) => {
+        const video = getVideo(card);
+        if (video) {
+        video.pause();
+        }
+        syncButton(card);
+        });
+        });
+
+        syncAllButtons();
+        })();
+
+        (function () {
+        const backToTop = document.getElementById("backToTop");
+        if (!backToTop) return;
+
+        function updateBackToTop() {
+        if (window.scrollY > 500) {
+        backToTop.classList.add("is-visible");
+        } else {
+        backToTop.classList.remove("is-visible");
+        }
+        }
+
+        window.addEventListener("scroll", updateBackToTop, { passive: true });
+        updateBackToTop();
+
+        backToTop.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        })();
+
+        (function () {
+        document.querySelectorAll(".step-illustration-box").forEach((box) => {
+        const img = box.querySelector("img");
+        if (!img) return;
+
+        function markLoaded() {
+        box.classList.add("loaded");
+        }
+
+        if (img.complete) {
+        markLoaded();
+        } else {
+        img.addEventListener("load", markLoaded, { once: true });
+        }
+        });
+        })();
+
+        (async function () {
+        const heroPanoramaElement = document.getElementById("hero-panorama");
+        const mobileLaunch = document.getElementById("mobilePanoramaLaunch");
+        if (!heroPanoramaElement || !window.pannellum) return;
+
+        const prevButton = document.getElementById("heroPrev");
+        const nextButton = document.getElementById("heroNext");
+        const isMobilePanorama = window.matchMedia("(max-width: 760px)").matches;
+        const MAX_PANORAMAS = 20;
+        const PANORAMA_VERSION = 110;
+
+        function imageExists(src) {
+        return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = src;
+        });
+        }
+
+        async function getAvailablePanoramas() {
+        const found = [];
+
+        for (let i = 1; i <= MAX_PANORAMAS; i++) {
+        const desktopSrc = `media/hero-panorama${i}.jpg?v=${PANORAMA_VERSION}`;
+        const mobileSrc = `media/hero-panorama${i}-mobile.jpg?v=${PANORAMA_VERSION}`;
+        const srcToCheck = isMobilePanorama ? mobileSrc : desktopSrc;
+
+        if (await imageExists(srcToCheck)) {
+        found.push({
+        desktop: desktopSrc,
+        mobile: mobileSrc
+        });
+        }
+        }
+
+        return found;
+        }
+
+        const panoramaFiles = await getAvailablePanoramas();
+
+        if (!panoramaFiles.length) {
+        heroPanoramaElement.style.display = "none";
+        if (mobileLaunch) mobileLaunch.style.display = "none";
+        if (prevButton) prevButton.style.display = "none";
+        if (nextButton) nextButton.style.display = "none";
+        return;
+        }
+
+        const panoramaImages = panoramaFiles.map((item) =>
+        isMobilePanorama ? item.mobile : item.desktop
+        );
+
+        if (mobileLaunch && panoramaFiles.length) {
+        const poster = mobileLaunch.querySelector(".panorama-mobile-poster");
+        if (poster) {
+        poster.src = panoramaFiles[0].mobile;
+        }
+        }
+
+        const scenes = {};
+        panoramaImages.forEach((path, index) => {
+        scenes["scene-" + index] = {
+        type: "equirectangular",
+        panorama: path,
+        autoLoad: true,
+        showControls: false,
+        mouseZoom: !isMobilePanorama,
+        draggable: true,
+        compass: false,
+        autoRotate: 0,
+        pitch: 0,
+        yaw: 0,
+        hfov: isMobilePanorama ? 100 : 110,
+        minHfov: isMobilePanorama ? 82 : 70,
+        maxHfov: isMobilePanorama ? 112 : 120
+        };
+        });
+
+        scenes["scene-0"].hotSpots = [
+        {
+        pitch: -22,
+        yaw: 180,
+        type: "scene",
+        text: "View from this spot",
+        sceneId: "hotspot-view-1",
+        targetPitch: -6,
+        targetYaw: 360,
+        targetHfov: isMobilePanorama ? 112 : 120,
+        cssClass: "vcds-floor-hotspot"
+        },
+        {
+        pitch: -8,
+        yaw: -8,
+        type: "scene",
+        text: "View from this angle",
+        sceneId: "hotspot-view-2",
+        targetPitch: -10,
+        targetYaw: 360,
+        targetHfov: isMobilePanorama ? 112 : 120,
+        cssClass: "vcds-floor-hotspot"
+        }
+        ];
+
+        scenes["hotspot-view-1"] = {
+        type: "equirectangular",
+        panorama: "media/hotspot-view-1.jpg",
+        hfov: isMobilePanorama ? 112 : 120,
+        minHfov: isMobilePanorama ? 82 : 70,
+        maxHfov: isMobilePanorama ? 112 : 120,
+        hotSpots: [
+        {
+        pitch: -18,
+        yaw: 180,
+        type: "scene",
+        text: "Back",
+        sceneId: "scene-0",
+        targetPitch: 0,
+        targetYaw: 0,
+        cssClass: "vcds-back-hotspot"
+        }
+        ]
+        };
+
+        scenes["hotspot-view-2"] = {
+        type: "equirectangular",
+        panorama: "media/hotspot-view-2.jpg",
+        hfov: isMobilePanorama ? 112 : 120,
+        minHfov: isMobilePanorama ? 82 : 70,
+        maxHfov: isMobilePanorama ? 112 : 120,
+        hotSpots: [
+        {
+        pitch: -18,
+        yaw: 180,
+        type: "scene",
+        text: "Back",
+        sceneId: "scene-0",
+        targetPitch: 0,
+        targetYaw: 175,
+        cssClass: "vcds-back-hotspot"
+        }
+        ]
+        };
+        // Starting camera view for each normal panorama
+        // yaw = left/right direction
+        // pitch = up/down direction
+        // hfov = zoom level, lower number = more zoomed in
+
+        // Starting camera view for each normal panorama
+        // yaw = left/right direction
+        // pitch = up/down direction
+        // hfov = zoom level, lower number = more zoomed in
+
+        if (scenes["scene-0"]) {
+        scenes["scene-0"].pitch = 0;
+        scenes["scene-0"].yaw = 0;
+        scenes["scene-0"].hfov = isMobilePanorama ? 100 : 150;
+        }
+
+        if (scenes["scene-1"]) {
+        scenes["scene-1"].pitch = -13;
+        scenes["scene-1"].yaw = 0;
+        scenes["scene-1"].hfov = isMobilePanorama ? 100 : 130;
+        }
+
+        if (scenes["scene-2"]) {
+        scenes["scene-2"].pitch = -15;
+        scenes["scene-2"].yaw = 0;
+        scenes["scene-2"].hfov = isMobilePanorama ? 100 : 150;
+        }
+
+        if (scenes["scene-3"]) {
+        scenes["scene-3"].pitch = -10;
+        scenes["scene-3"].yaw = 150;
+        scenes["scene-3"].hfov = isMobilePanorama ? 100 : 150;
+        }
+
+        if (scenes["scene-4"]) {
+        scenes["scene-4"].pitch = -5;
+        scenes["scene-4"].yaw = 180;
+        scenes["scene-4"].hfov = isMobilePanorama ? 100 : 150;
+        }
+
+        if (scenes["scene-5"]) {
+        scenes["scene-5"].pitch = -15;
+        scenes["scene-5"].yaw = 265;
+        scenes["scene-5"].hfov = isMobilePanorama ? 100 : 150;
+        }
+
+        if (scenes["scene-6"]) {
+        scenes["scene-6"].pitch = -10;
+        scenes["scene-6"].yaw = 350;
+        scenes["scene-6"].hfov = isMobilePanorama ? 100 : 150;
+        }
+
+        if (scenes["scene-7"]) {
+        scenes["scene-7"].pitch = -5;
+        scenes["scene-7"].yaw = -160;
+        scenes["scene-7"].hfov = isMobilePanorama ? 100 : 150;
+        }
+
+        if (scenes["scene-8"]) {
+        scenes["scene-8"].pitch = 0;
+        scenes["scene-8"].yaw = 360;
+        scenes["scene-8"].hfov = isMobilePanorama ? 100 : 150;
+        }
+
+        if (scenes["scene-9"]) {
+        scenes["scene-9"].pitch = 0;
+        scenes["scene-9"].yaw = -240;
+        scenes["scene-9"].hfov = isMobilePanorama ? 100 : 110;
+        }
+
+        let currentIndex = 0;
+        let viewer = null;
+        let panoramaReady = false;
+        const autoRotateSpeed = isMobilePanorama ? -8 : -5;
+        let resumeRotateTimer;
+        let panoramaInView = false;
+
+        function stopAutoRotateNow() {
+        clearTimeout(resumeRotateTimer);
+        if (viewer && typeof viewer.stopAutoRotate === "function") {
+        viewer.stopAutoRotate();
+        }
+        }
+
+        function resumeAutoRotate(delay = 1000) {
+        clearTimeout(resumeRotateTimer);
+        if (!viewer || !panoramaReady || !panoramaInView || autoRotateSpeed === 0) return;
+
+        resumeRotateTimer = setTimeout(() => {
+        if (viewer && panoramaInView && typeof viewer.startAutoRotate === "function") {
+        viewer.startAutoRotate(autoRotateSpeed);
+        }
+        }, delay);
+        }
+
+        function setupPanoramaVisibilityPause() {
+        if (!heroPanoramaElement || !("IntersectionObserver" in window)) {
+        panoramaInView = true;
+        return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+
+        panoramaInView = !!entry && entry.isIntersecting && entry.intersectionRatio > 0.15;
+
+        if (panoramaInView) {
+        resumeAutoRotate(800);
+        } else {
+        stopAutoRotateNow();
+        }
+        }, {
+        threshold: [0, 0.15, 0.4]
+        });
+
+        observer.observe(heroPanoramaElement);
+        }
+
+        function updateButtons() {
+        const multiple = panoramaImages.length > 1 && panoramaReady;
+        if (prevButton) prevButton.style.display = multiple ? "" : "none";
+        if (nextButton) nextButton.style.display = multiple ? "" : "none";
+        }
+
+        function showScene(index) {
+        if (!viewer || !panoramaReady) return;
+        currentIndex = ((index % panoramaImages.length) + panoramaImages.length) % panoramaImages.length;
+        viewer.loadScene("scene-" + currentIndex);
+        resumeAutoRotate(1200);
+        }
+
+        function initPanorama() {
+        if (viewer) return;
+
+        viewer = pannellum.viewer("hero-panorama", {
+        default: {
+        firstScene: "scene-0",
+        sceneFadeDuration: isMobilePanorama ? 240 : 360
+        },
+        scenes: scenes
+        });
+
+        viewer.on("load", () => {
+        panoramaReady = true;
+        heroPanoramaElement.classList.add("is-live");
+        if (mobileLaunch) {
+        mobileLaunch.classList.add("is-hidden");
+        }
+        updateButtons();
+        resumeAutoRotate(1200);
+        });
+
+        setupPanoramaVisibilityPause();
+
+        heroPanoramaElement.addEventListener("mousedown", stopAutoRotateNow);
+        heroPanoramaElement.addEventListener("touchstart", stopAutoRotateNow, { passive: true });
+
+        window.addEventListener("mouseup", () => resumeAutoRotate(1000));
+        window.addEventListener("touchend", () => resumeAutoRotate(1000), { passive: true });
+
+        heroPanoramaElement.addEventListener("mouseleave", () => resumeAutoRotate(1000));
+        }
+
+        if (prevButton) {
+        prevButton.addEventListener("click", () => {
+        if (!viewer) return;
+        showScene(currentIndex - 1);
+        });
+        }
+
+        if (nextButton) {
+        nextButton.addEventListener("click", () => {
+        if (!viewer) return;
+        showScene(currentIndex + 1);
+        });
+        }
+
+        if (isMobilePanorama && mobileLaunch) {
+        updateButtons();
+        mobileLaunch.addEventListener("click", () => {
+        mobileLaunch.classList.add("is-hidden");
+        initPanorama();
+        }, { once: true });
+        } else {
+        initPanorama();
+        }
+        })();
+
+        (function () {
+        const wallpaperBg = document.getElementById("wallpaperBg");
+        const wallpaperStage = document.getElementById("wallpaperStage");
+        const wallpaperDots = document.getElementById("wallpaperDots");
+        const wallpaperDescription = document.getElementById("wallpaperDescription");
+        const wallpaperPrev = document.getElementById("wallpaperPrev");
+        const wallpaperNext = document.getElementById("wallpaperNext");
+        const wallpaperCount = document.getElementById("wallpaperCount");
+
+        if (!wallpaperBg || !wallpaperStage || !wallpaperDots || !wallpaperDescription) return;
+
+        const MAX_WALLPAPERS = 20;
+        const WALLPAPER_AUTO_DELAY = 4000;
+        const LIVE_STEP_THRESHOLD = window.innerWidth <= 760 ? 300 : 600;
+        const RELEASE_THRESHOLD = window.innerWidth <= 760 ? 105 : 175;
+
+        const WALLPAPER_TITLES = {
+        1: "Lighting Gallery",
+        2: "Yellow Atrium",
+        3: "Design Loft",
+        4: "Material Gallery",
+        5: "Furniture Gallery",
+        6: "Fashion Studio",
+        7: "Art Gallery",
+        8: "Modern Patio"
+        };
+
+        let wallpapers = [];
+        let cards = [];
+        let dots = [];
+        let currentIndex = 0;
+
+        let wallpaperDragStartX = 0;
+        let wallpaperDragDeltaX = 0;
+        let wallpaperDragging = false;
+        let wallpaperSuppressClick = false;
+        let wallpaperAutoTimer = null;
+
+        function imageExists(src) {
+        return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = src;
+        });
+        }
+
+        async function getAvailableWallpapers() {
+        const found = [];
+
+        for (let i = 1; i <= MAX_WALLPAPERS; i++) {
+        const src = `media/wallpaper${i}.jpg?v=102`;
+
+        if (await imageExists(src)) {
+        found.push({
+        src,
+        description: WALLPAPER_TITLES[i] || `Project image ${i}`
+        });
+        }
+        }
+
+        return found;
+        }
+
+        function mod(number, total) {
+        return ((number % total) + total) % total;
+        }
+
+        function setWallpaperDrag(value) {
+        wallpaperStage.style.setProperty("--wallpaper-drag", value + "px");
+        }
+
+        function clearWallpaperClasses(card) {
+        card.classList.remove(
+        "is-center",
+        "is-left",
+        "is-right",
+        "is-far-left",
+        "is-far-right",
+        "is-hidden"
+        );
+        }
+
+        function stopWallpaperAutoplay() {
+        clearTimeout(wallpaperAutoTimer);
+        wallpaperAutoTimer = null;
+        }
+
+        function startWallpaperAutoplay() {
+        stopWallpaperAutoplay();
+
+        if (wallpapers.length <= 1) return;
+
+        wallpaperAutoTimer = setTimeout(() => {
+        if (wallpaperDragging) {
+        startWallpaperAutoplay();
+        return;
+        }
+
+        updateWallpaperSlider(currentIndex + 1);
+        }, WALLPAPER_AUTO_DELAY);
+        }
+
+        function updateWallpaperSlider(index, keepDragging = false) {
+        const total = wallpapers.length;
+        if (!total) return;
+
+        currentIndex = mod(index, total);
+
+        const leftIndex = mod(currentIndex - 1, total);
+        const rightIndex = mod(currentIndex + 1, total);
+        const farLeftIndex = mod(currentIndex - 2, total);
+        const farRightIndex = mod(currentIndex + 2, total);
+
+        cards.forEach((card, i) => {
+        clearWallpaperClasses(card);
+
+        if (i === currentIndex) card.classList.add("is-center");
+        else if (i === leftIndex) card.classList.add("is-left");
+        else if (i === rightIndex) card.classList.add("is-right");
+        else if (i === farLeftIndex) card.classList.add("is-far-left");
+        else if (i === farRightIndex) card.classList.add("is-far-right");
+        else card.classList.add("is-hidden");
+        });
+
+        const visibleDotCount = Math.min(5, total);
+        const dotPageStart = Math.floor(currentIndex / 5) * 5;
+
+        dots.forEach((dot, slotIndex) => {
+        const wallpaperIndex = dotPageStart + slotIndex;
+
+        if (wallpaperIndex >= total) {
+        dot.style.visibility = "hidden";
+        dot.style.pointerEvents = "none";
+        dot.dataset.wallpaperIndex = "";
+        dot.classList.remove("is-active");
+        return;
+        }
+
+        dot.style.visibility = "visible";
+        dot.style.pointerEvents = "";
+        dot.dataset.wallpaperIndex = wallpaperIndex;
+        dot.classList.toggle("is-active", wallpaperIndex === currentIndex);
+        dot.setAttribute("aria-label", `Wallpaper ${wallpaperIndex + 1}`);
+        });
+
+        if (wallpaperCount) {
+        wallpaperCount.textContent = `${currentIndex + 1} / ${total}`;
+        }
+
+        const activeItem = wallpapers[currentIndex];
+        wallpaperBg.style.backgroundImage = `url("${activeItem.src}")`;
+        wallpaperDescription.textContent = activeItem.description || "";
+
+        if (keepDragging) {
+        wallpaperStage.classList.add("is-dragging");
+        stopWallpaperAutoplay();
+        } else {
+        wallpaperStage.classList.remove("is-dragging");
+        setWallpaperDrag(0);
+        startWallpaperAutoplay();
+        }
+
+        const multiple = total > 1;
+        if (wallpaperPrev) wallpaperPrev.disabled = !multiple;
+        if (wallpaperNext) wallpaperNext.disabled = !multiple;
+        }
+
+        function finishWallpaperDrag(event) {
+        if (!wallpaperDragging) return;
+
+        const finalDelta = wallpaperDragDeltaX;
+        const movedEnoughToBlockClick = Math.abs(finalDelta) > 10;
+
+        wallpaperDragging = false;
+        wallpaperDragStartX = 0;
+        wallpaperDragDeltaX = 0;
+
+        wallpaperStage.classList.remove("is-dragging");
+        setWallpaperDrag(0);
+
+        if (movedEnoughToBlockClick) {
+        wallpaperSuppressClick = true;
+        }
+
+        if (event && wallpaperStage.releasePointerCapture) {
+        try {
+        wallpaperStage.releasePointerCapture(event.pointerId);
+        } catch (error) {}
+        }
+
+        if (finalDelta <= -RELEASE_THRESHOLD) {
+        updateWallpaperSlider(currentIndex + 1);
+        return;
+        }
+
+        if (finalDelta >= RELEASE_THRESHOLD) {
+        updateWallpaperSlider(currentIndex - 1);
+        return;
+        }
+
+        updateWallpaperSlider(currentIndex);
+        }
+
+        async function initWallpaperShowcase() {
+        wallpapers = await getAvailableWallpapers();
+
+        wallpapers.forEach((item) => {
+        const preloadImg = new Image();
+        preloadImg.src = item.src;
+        });
+
+        if (!wallpapers.length) {
+        const wallpaperSection = document.getElementById("wallpapers");
+        if (wallpaperSection) wallpaperSection.style.display = "none";
+        return;
+        }
+
+        wallpaperStage.innerHTML = "";
+        wallpaperDots.innerHTML = "";
+        cards = [];
+        dots = [];
+
+        const visibleDotCount = Math.min(5, wallpapers.length);
+
+        for (let i = 0; i < visibleDotCount; i++) {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "wallpaper-dot";
+        wallpaperDots.appendChild(dot);
+        dots.push(dot);
+
+        dot.addEventListener("click", () => {
+        const wallpaperIndex = Number(dot.dataset.wallpaperIndex);
+        if (Number.isNaN(wallpaperIndex)) return;
+        updateWallpaperSlider(wallpaperIndex);
+        });
+        }
+
+        wallpapers.forEach((item, index) => {
+        const card = document.createElement("article");
+        card.className = "wallpaper-card";
+
+        const img = document.createElement("img");
+        img.src = item.src;
+        img.alt = item.description || `Wallpaper ${index + 1}`;
+        img.draggable = false;
+        img.addEventListener("dragstart", (e) => e.preventDefault());
+
+        card.appendChild(img);
+        wallpaperStage.appendChild(card);
+        cards.push(card);
+
+        card.addEventListener("click", (event) => {
+        if (wallpaperSuppressClick) {
+        wallpaperSuppressClick = false;
+        event.preventDefault();
+        return;
+        }
+
+        updateWallpaperSlider(index);
+        });
+        });
+
+        if (wallpaperPrev) {
+        wallpaperPrev.addEventListener("click", () => {
+        updateWallpaperSlider(currentIndex - 1);
+        });
+        }
+
+        if (wallpaperNext) {
+        wallpaperNext.addEventListener("click", () => {
+        updateWallpaperSlider(currentIndex + 1);
+        });
+        }
+
+        wallpaperStage.addEventListener("pointerdown", (event) => {
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+
+        wallpaperDragging = true;
+        wallpaperSuppressClick = false;
+        wallpaperDragStartX = event.clientX;
+        wallpaperDragDeltaX = 0;
+
+        wallpaperStage.classList.add("is-dragging");
+        setWallpaperDrag(0);
+        stopWallpaperAutoplay();
+
+        if (wallpaperStage.setPointerCapture) {
+        try {
+        wallpaperStage.setPointerCapture(event.pointerId);
+        } catch (error) {}
+        }
+        });
+
+        wallpaperStage.addEventListener("pointermove", (event) => {
+        if (!wallpaperDragging) return;
+
+        wallpaperDragDeltaX = event.clientX - wallpaperDragStartX;
+
+        while (wallpaperDragDeltaX <= -LIVE_STEP_THRESHOLD) {
+        wallpaperDragStartX -= LIVE_STEP_THRESHOLD;
+        wallpaperDragDeltaX += LIVE_STEP_THRESHOLD;
+        updateWallpaperSlider(currentIndex + 1, true);
+        }
+
+        while (wallpaperDragDeltaX >= LIVE_STEP_THRESHOLD) {
+        wallpaperDragStartX += LIVE_STEP_THRESHOLD;
+        wallpaperDragDeltaX -= LIVE_STEP_THRESHOLD;
+        updateWallpaperSlider(currentIndex - 1, true);
+        }
+
+        setWallpaperDrag(wallpaperDragDeltaX);
+        });
+
+        wallpaperStage.addEventListener("pointerup", finishWallpaperDrag);
+        wallpaperStage.addEventListener("pointercancel", finishWallpaperDrag);
+        wallpaperStage.addEventListener("lostpointercapture", finishWallpaperDrag);
+
+        updateWallpaperSlider(0);
+        }
+
+        initWallpaperShowcase();
+        })();
+    </script>
+
+    <script>
+        (function () {
+        const contactForm = document.getElementById("contactForm");
+        const contactStatus = document.getElementById("contactStatus");
+
+        if (!contactForm) return;
+
+        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbwo7LPSlgDDrSK7i19LfDM7GMZICqSsy6d6u-ZZleIe93F81lCXzyHES3Kpc4lF79Of/exec";
+
+        contactForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton ? submitButton.textContent : "Send Message";
+
+        const formData = new FormData(contactForm);
+
+        if (contactStatus) {
+        contactStatus.style.display = "block";
+        contactStatus.textContent = "Sending your message...";
+        }
+
+        if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Sending...";
+        }
+
+        fetch(googleScriptUrl, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+        })
+        .then(function () {
+        if (contactStatus) {
+        contactStatus.textContent = "Thank you — your message has been sent.";
+        }
+
+        contactForm.reset();
+        })
+        .catch(function () {
+        if (contactStatus) {
+        contactStatus.textContent = "Sorry, something went wrong. Please email hello@visioncraft.uk.";
+        }
+        })
+        .finally(function () {
+        if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
+        }
+        });
+        });
+        })();
+    </script>
+
+</body>
+</html>

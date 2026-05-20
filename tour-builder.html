@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create a 360 Tour | VisionCraft Design Studio</title>
+    <meta name="description" content="Create a simple browser-based 360 virtual tour with scenes and hotspots." />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css">
+    <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg: #f3f1ed;
+            --surface: #fbfaf7;
+            --surface-2: #f7f4ef;
+            --ink: #111111;
+            --text: #222222;
+            --muted: #6a6863;
+            --line: #d8d3cb;
+            --line-strong: #bdb7ae;
+            --radius: 26px;
+            --shadow: 0 16px 40px rgba(0, 0, 0, 0.05);
+            --shadow-strong: 0 20px 48px rgba(0, 0, 0, 0.12);
+            --max: 1500px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        h1, h2, h3 {
+            margin: 0 0 14px;
+            color: var(--ink);
+            font-family: "DM Serif Display", Georgia, serif;
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            line-height: 1.06;
+        }
+
+        h1 {
+            font-size: clamp(2.8rem, 6vw, 5.4rem);
+            max-width: 920px;
+        }
+
+        h2 {
+            font-size: clamp(1.8rem, 3.4vw, 3rem);
+        }
+
+        h3 {
+            font-size: 1.35rem;
+        }
+
+        p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            max-width: 760px;
+        }
+
+        .container {
+            width: min(calc(100% - 44px), var(--max));
+            margin: 0 auto;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(243, 241, 237, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+        }
+
+        .nav {
+            min-height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 12px 0;
+        }
+
+        .brand-logo {
+            width: 230px;
+            height: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: center;
+            color: #333333;
+            font-size: 0.95rem;
+        }
+
+            .nav-links a:hover {
+                opacity: 0.65;
+            }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 20px;
+            border-radius: 999px;
+            border: 1px solid var(--ink);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+            font-family: inherit;
+        }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+        .btn-dark {
+            background: var(--ink);
+            color: #ffffff;
+        }
+
+        .btn-light {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn-soft {
+            border-color: var(--line);
+            background: var(--surface);
+            color: var(--ink);
+        }
+
+        .hero {
+            padding: 48px 0 34px;
+        }
+
+        .eyebrow {
+            margin: 0 0 14px;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .privacy-note {
+            margin-top: 28px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            background: rgba(251, 250, 247, 0.75);
+            box-shadow: var(--shadow);
+            max-width: 860px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .builder-layout {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 24px;
+            padding: 24px 0 84px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+            .panel + .panel {
+                margin-top: 18px;
+            }
+
+        .drop-zone {
+            display: grid;
+            place-items: center;
+            width: 100%;
+            min-height: 136px;
+            border: 1px dashed var(--line-strong);
+            background: var(--surface-2);
+            border-radius: 22px;
+            padding: 28px 18px;
+            text-align: center;
+            transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+        }
+
+            .drop-zone:hover,
+            .drop-zone.is-dragging {
+                background: #ffffff;
+                border-color: var(--ink);
+                transform: translateY(-1px);
+            }
+
+            .drop-zone strong {
+                display: block;
+                color: var(--ink);
+                margin-bottom: 6px;
+                font-size: 1rem;
+                line-height: 1.25;
+            }
+
+            .drop-zone span {
+                color: var(--muted);
+                font-size: 0.92rem;
+            }
+
+        .file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .file-button {
+            margin-top: 14px;
+            width: 100%;
+        }
+
+        .scene-list,
+        .hotspot-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .scene-item,
+        .hotspot-item {
+            width: 100%;
+            border: 1px solid var(--line);
+            background: var(--surface-2);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: left;
+            display: grid;
+            gap: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+            .scene-item.is-active {
+                border-color: var(--ink);
+                background: #ffffff;
+            }
+
+            .scene-item strong,
+            .hotspot-item strong {
+                color: var(--ink);
+                font-size: 0.95rem;
+            }
+
+            .scene-item span,
+            .hotspot-item span {
+                color: var(--muted);
+                font-size: 0.82rem;
+            }
+
+        .field {
+            display: grid;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+            .field label {
+                color: var(--ink);
+                font-size: 0.92rem;
+                font-weight: 600;
+            }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid var(--line);
+            background: var(--surface-2);
+            color: var(--ink);
+            border-radius: 14px;
+            padding: 13px 14px;
+            font: inherit;
+            outline: none;
+        }
+
+            input:focus,
+            select:focus {
+                border-color: var(--line-strong);
+                background: #ffffff;
+            }
+
+            input[type="range"] {
+                padding: 0;
+                accent-color: var(--ink);
+            }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .advanced-settings {
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: var(--surface-2);
+            overflow: hidden;
+        }
+
+            .advanced-settings summary {
+                list-style: none;
+                cursor: pointer;
+                padding: 16px 18px;
+                font-weight: 700;
+                color: var(--ink);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+
+                .advanced-settings summary::-webkit-details-marker {
+                    display: none;
+                }
+
+                .advanced-settings summary::after {
+                    content: "+";
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 999px;
+                    background: var(--ink);
+                    color: #ffffff;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1rem;
+                    line-height: 1;
+                }
+
+            .advanced-settings[open] summary::after {
+                content: "−";
+            }
+
+        .advanced-content {
+            padding: 0 18px 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        .advanced-note {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin: 12px 0 8px;
+        }
+
+        .advanced-divider {
+            border: 0;
+            border-top: 1px solid var(--line);
+            margin: 18px 0;
+        }
+
+        .range-line {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .range-value {
+            min-width: 46px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--ink);
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 4px 8px;
+            font-size: 0.85rem;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            color: var(--ink);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+            .toggle-row input {
+                width: 18px;
+                height: 18px;
+            }
+
+        .advanced-speed-wrap {
+            display: none;
+        }
+
+            .advanced-speed-wrap.is-visible {
+                display: grid;
+            }
+
+        .preview-shell {
+            position: sticky;
+            top: 104px;
+        }
+
+        .viewer-frame {
+            position: relative;
+            width: 100%;
+            min-height: clamp(430px, 66vh, 780px);
+            border-radius: 34px;
+            overflow: hidden;
+            border: 1px solid rgba(17, 17, 17, 0.08);
+            box-shadow: var(--shadow-strong);
+            background: #b4aea6;
+        }
+
+            .viewer-frame::before {
+                content: "";
+                position: absolute;
+                inset: 16px;
+                border: 1px solid rgba(255, 255, 255, 0.42);
+                border-radius: 28px;
+                pointer-events: none;
+                z-index: 2;
+            }
+
+        #tourPreview {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .empty-viewer {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #d8d3cb, #f3f1ed);
+        }
+
+            .empty-viewer div {
+                max-width: 420px;
+            }
+
+            .empty-viewer strong {
+                display: block;
+                color: var(--ink);
+                font-size: 1.2rem;
+                margin-bottom: 6px;
+            }
+
+        .viewer-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .current-view {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .placing-banner {
+            display: none;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: #111111;
+            color: #ffffff;
+            font-size: 0.92rem;
+        }
+
+            .placing-banner.is-visible {
+                display: block;
+            }
+
+        .pnlm-hotspot-base.vc-tour-hotspot {
+            width: 46px !important;
+            height: 46px !important;
+            border-radius: 999px;
+            background: rgba(251, 250, 247, 0.92) !important;
+            background-image: none !important;
+            border: 1px solid rgba(17, 17, 17, 0.14);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+            cursor: pointer;
+            touch-action: none;
+        }
+
+            .pnlm-hotspot-base.vc-tour-hotspot::before {
+                content: "";
+                position: absolute;
+                inset: 13px;
+                border-radius: 999px;
+                background: #111111;
+            }
+
+            .pnlm-hotspot-base.vc-tour-hotspot.is-being-dragged {
+                opacity: 0.55 !important;
+                box-shadow: 0 18px 38px rgba(0, 0, 0, 0.34) !important;
+            }
+
+        .drag-ghost-hotspot {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 46px;
+            height: 46px;
+            border-radius: 999px;
+            background: rgba(251, 250, 247, 0.58);
+            border: 1px solid rgba(17, 17, 17, 0.18);
+            box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            display: none;
+        }
+
+            .drag-ghost-hotspot::before {
+                content: "";
+                position: absolute;
+                inset: 13px;
+                border-radius: 999px;
+                background: rgba(17, 17, 17, 0.82);
+            }
+
+            .drag-ghost-hotspot.is-visible {
+                display: block;
+            }
+
+        .viewer-frame.is-hotspot-dragging {
+            cursor: grabbing;
+        }
+
+        .footer {
+            padding: 26px 0 38px;
+            border-top: 1px solid rgba(17, 17, 17, 0.08);
+        }
+
+        .footer-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 22px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .footer-brand img {
+            width: 170px;
+            height: auto;
+        }
+
+        .footer-brand small {
+            color: var(--muted);
+            display: block;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 1050px) {
+            .builder-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-shell {
+                position: relative;
+                top: auto;
+            }
+
+            .viewer-frame {
+                min-height: 460px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .container {
+                width: min(calc(100% - 20px), var(--max));
+            }
+
+            .nav {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .brand-logo {
+                width: 180px;
+            }
+
+            .viewer-frame {
+                min-height: 340px;
+                border-radius: 22px;
+            }
+
+            .panel {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a href="index.html" class="brand" aria-label="VisionCraft Design Studio home">
+                <img src="logo.png" alt="VisionCraft Design Studio logo" class="brand-logo" />
+            </a>
+
+            <nav class="nav-links" aria-label="Primary navigation">
+                <a href="index.html">Main site</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <p class="eyebrow">Browser-only 360 tour creator</p>
+                <h1>Create a simple 360 virtual tour.</h1>
+                <p>
+                    Add 360 images, connect them with clickable hotspots, preview the experience,
+                    and export a standalone tour file.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#builder" class="btn btn-dark">Start building</a>
+                    <a href="index.html" class="btn btn-light">Back to website</a>
+                </div>
+
+                <div class="privacy-note">
+                    Your images stay inside your browser while using this tool. They are not uploaded or saved to this website.
+                    If you refresh or close the page before exporting, the current tour will be lost.
+                </div>
+            </div>
+        </section>
+
+        <section id="builder" class="container builder-layout">
+            <aside>
+                <div class="panel">
+                    <p class="eyebrow">Step 01</p>
+                    <h2>Add 360 images</h2>
+                    <p>Upload equirectangular 360 images. Best ratio: 2:1, like 4096 × 2048 or 8000 × 4000.</p>
+
+                    <div class="drop-zone" id="dropZone">
+                        <div>
+                            <strong>Drag and drop images here</strong>
+                            <span>or choose files using the button below</span>
+                        </div>
+                    </div>
+
+                    <input class="file-input" type="file" id="fileInput" accept="image/*" multiple />
+                    <label class="btn btn-dark file-button" for="fileInput">Choose 360 images</label>
+
+                    <div class="scene-list" id="sceneList"></div>
+                </div>
+
+                <div class="panel">
+                    <p class="eyebrow">Step 02</p>
+                    <h2>Add hotspots</h2>
+                    <p>Select a scene, choose where the hotspot should go, then click inside the 360 preview.</p>
+
+                    <div class="field">
+                        <label for="hotspotLabel">Hotspot label</label>
+                        <input id="hotspotLabel" type="text" placeholder="Go to next room" />
+                    </div>
+
+                    <div class="field">
+                        <label for="targetScene">Hotspot links to</label>
+                        <select id="targetScene"></select>
+                    </div>
+
+                    <div class="button-row">
+                        <button class="btn btn-dark" id="placeHotspotBtn" type="button">Place hotspot</button>
+                        <button class="btn btn-soft" id="cancelPlaceBtn" type="button">Cancel</button>
+                    </div>
+
+                    <div class="placing-banner" id="placingBanner">
+                        Placement mode is on. Click inside the 360 image to place the hotspot.
+                    </div>
+
+                    <div class="hotspot-list" id="hotspotList"></div>
+                </div>
+
+                <div class="panel">
+                    <details class="advanced-settings" id="advancedSettings">
+                        <summary>More advanced settings</summary>
+
+                        <div class="advanced-content">
+                            <p class="advanced-note">
+                                These settings apply to the currently selected 360 image.
+                            </p>
+
+                            <h3>Starting view</h3>
+
+                            <div class="field">
+                                <label for="startYawInput">Look left / right</label>
+                                <div class="range-line">
+                                    <input id="startYawInput" type="range" min="-180" max="180" step="1" value="0" />
+                                    <span class="range-value" id="startYawValue">0</span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="startPitchInput">Look down / up</label>
+                                <div class="range-line">
+                                    <input id="startPitchInput" type="range" min="-45" max="45" step="1" value="0" />
+                                    <span class="range-value" id="startPitchValue">0</span>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="startZoomInput">Start zoom</label>
+                                <div class="range-line">
+                                    <input id="startZoomInput" type="range" min="-20" max="30" step="1" value="0" />
+                                    <span class="range-value" id="startZoomValue">0</span>
+                                </div>
+                                <p class="advanced-note">
+                                    0 = normal, minus = more zoomed out, plus = more zoomed in.
+                                </p>
+                            </div>
+
+                            <div class="button-row">
+                                <button class="btn btn-soft" id="saveStartAdvancedBtn" type="button">Use current view as start</button>
+                            </div>
+
+                            <hr class="advanced-divider" />
+
+                            <h3>Auto-rotate</h3>
+
+                            <label class="toggle-row">
+                                <input id="autoRotateCheck" type="checkbox" />
+                                Enable auto-rotate for this image
+                            </label>
+
+                            <div class="field advanced-speed-wrap" id="autoRotateSpeedWrap">
+                                <label for="autoRotateSpeed">Auto-rotate speed</label>
+                                <div class="range-line">
+                                    <input id="autoRotateSpeed" type="range" min="-10" max="10" step="1" value="-3" />
+                                    <span class="range-value" id="autoRotateSpeedValue">-3</span>
+                                </div>
+                                <p class="advanced-note">
+                                    Negative rotates one direction, positive rotates the other. 0 means no movement.
+                                </p>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="panel">
+                    <p class="eyebrow">Step 03</p>
+                    <h2>Export</h2>
+                    <p>Download a standalone HTML tour file. The exported file includes the images inside it, so large images can create a large file.</p>
+
+                    <div class="button-row">
+                        <button class="btn btn-dark" id="exportBtn" type="button">Download tour HTML</button>
+                        <button class="btn btn-light" id="clearBtn" type="button">Clear builder</button>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="preview-shell">
+                <div class="viewer-frame" id="viewerFrame">
+                    <div id="tourPreview">
+                        <div class="empty-viewer">
+                            <div>
+                                <strong>No 360 image loaded yet</strong>
+                                <p>Add one or more 360 images to start building your tour.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="viewer-toolbar">
+                    <div class="current-view" id="currentViewText">
+                        Current scene: none
+                    </div>
+
+                    <div class="button-row">
+                        <button class="btn btn-soft" id="saveStartBtn" type="button">Use current view as start</button>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" aria-label="VisionCraft Design Studio home">
+                    <img src="logo.png" alt="VisionCraft Design Studio logo" />
+                </a>
+                <small>Immersive presentation for interior, retail, and spatial experiences.</small>
+            </div>
+
+            <div class="nav-links">
+                <a href="index.html">Main site</a>
+                <a href="mailto:hello@visioncraft.uk">hello@visioncraft.uk</a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="drag-ghost-hotspot" id="dragGhostHotspot"></div>
+
+    <script>
+        const scenes = [];
+        let sceneCounter = 1;
+        let currentSceneId = null;
+        let viewer = null;
+        let placingHotspot = false;
+
+        const fileInput = document.getElementById("fileInput");
+        const dropZone = document.getElementById("dropZone");
+        const sceneList = document.getElementById("sceneList");
+        const targetScene = document.getElementById("targetScene");
+        const hotspotLabel = document.getElementById("hotspotLabel");
+        const hotspotList = document.getElementById("hotspotList");
+        const placeHotspotBtn = document.getElementById("placeHotspotBtn");
+        const cancelPlaceBtn = document.getElementById("cancelPlaceBtn");
+        const placingBanner = document.getElementById("placingBanner");
+        const exportBtn = document.getElementById("exportBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const saveStartBtn = document.getElementById("saveStartBtn");
+        const saveStartAdvancedBtn = document.getElementById("saveStartAdvancedBtn");
+        const currentViewText = document.getElementById("currentViewText");
+        const viewerFrame = document.getElementById("viewerFrame");
+        const dragGhostHotspot = document.getElementById("dragGhostHotspot");
+
+        const startYawInput = document.getElementById("startYawInput");
+        const startPitchInput = document.getElementById("startPitchInput");
+        const startZoomInput = document.getElementById("startZoomInput");
+        const startYawValue = document.getElementById("startYawValue");
+        const startPitchValue = document.getElementById("startPitchValue");
+        const startZoomValue = document.getElementById("startZoomValue");
+
+        const autoRotateCheck = document.getElementById("autoRotateCheck");
+        const autoRotateSpeedWrap = document.getElementById("autoRotateSpeedWrap");
+        const autoRotateSpeed = document.getElementById("autoRotateSpeed");
+        const autoRotateSpeedValue = document.getElementById("autoRotateSpeedValue");
+
+        let draggingHotspot = null;
+        let suppressHotspotSceneClick = false;
+        let edgePanAnimation = null;
+
+        function roundNumber(value) {
+        return Math.round(value * 100) / 100;
+        }
+
+        function clampNumber(value, min, max, fallback) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+        return fallback;
+        }
+
+        return Math.min(max, Math.max(min, number));
+        }
+
+        function zoomSliderToHfov(value) {
+        const zoom = clampNumber(value, -20, 30, 0);
+        return roundNumber(clampNumber(100 - zoom, 70, 120, 100));
+        }
+
+        function hfovToZoomSlider(hfov) {
+        return roundNumber(clampNumber(100 - Number(hfov), -20, 30, 0));
+        }
+
+        function getScene(id) {
+        return scenes.find(scene => scene.id === id);
+        }
+
+        function ensureSceneAdvancedSettings(scene) {
+        if (!scene.autoRotate) {
+        scene.autoRotate = {
+        enabled: false,
+        speed: -3
+        };
+        }
+        }
+
+        function handleFiles(files) {
+        Array.from(files).forEach(file => {
+        if (!file.type.startsWith("image/")) return;
+
+        const scene = {
+        id: "scene-" + sceneCounter,
+        name: file.name.replace(/\.[^/.]+$/, "") || "Scene " + sceneCounter,
+        file,
+        url: URL.createObjectURL(file),
+        dataUrl: null,
+        start: {
+        pitch: 0,
+        yaw: 0,
+        hfov: 100
+        },
+        autoRotate: {
+        enabled: false,
+        speed: -3
+        },
+        hotSpots: []
+        };
+
+        sceneCounter += 1;
+        scenes.push(scene);
+
+        if (!currentSceneId) {
+        currentSceneId = scene.id;
+        }
+        });
+
+        renderAll();
+        initViewer(currentSceneId);
+        }
+
+        function renderAll() {
+        renderSceneList();
+        renderTargetOptions();
+        renderHotspotList();
+        updateCurrentViewText();
+        syncAdvancedSettings();
+        }
+
+        function renderSceneList() {
+        sceneList.innerHTML = "";
+
+        if (!scenes.length) {
+        sceneList.innerHTML = "<p>No scenes added yet.</p>";
+        return;
+        }
+
+        scenes.forEach((scene, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "scene-item" + (scene.id === currentSceneId ? " is-active" : "");
+        button.innerHTML = `
+        <strong>${index + 1}. ${escapeHtml(scene.name)}</strong>
+        <span>${scene.hotSpots.length} hotspot${scene.hotSpots.length === 1 ? "" : "s"}</span>
+        `;
+
+        button.addEventListener("click", () => {
+        selectScene(scene.id, true);
+        });
+
+        sceneList.appendChild(button);
+        });
+        }
+
+        function renderTargetOptions() {
+        targetScene.innerHTML = "";
+
+        scenes.forEach(scene => {
+        if (scene.id === currentSceneId) return;
+
+        const option = document.createElement("option");
+        option.value = scene.id;
+        option.textContent = scene.name;
+        targetScene.appendChild(option);
+        });
+
+        if (!targetScene.children.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Add another scene first";
+        targetScene.appendChild(option);
+        }
+        }
+
+        function renderHotspotList() {
+        hotspotList.innerHTML = "";
+
+        const scene = getScene(currentSceneId);
+
+        if (!scene || !scene.hotSpots.length) {
+        hotspotList.innerHTML = "<p>No hotspots on this scene yet.</p>";
+        return;
+        }
+
+        scene.hotSpots.forEach(hotspot => {
+        const target = getScene(hotspot.targetId);
+        const item = document.createElement("div");
+        item.className = "hotspot-item";
+        item.innerHTML = `
+        <strong>${escapeHtml(hotspot.text)}</strong>
+        <span>Links to: ${target ? escapeHtml(target.name) : "Missing scene"}</span>
+        <span>pitch: ${hotspot.pitch}, yaw: ${hotspot.yaw}</span>
+        `;
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "btn btn-light";
+        remove.textContent = "Remove";
+        remove.style.marginTop = "8px";
+
+        remove.addEventListener("click", () => {
+        scene.hotSpots = scene.hotSpots.filter(item => item.id !== hotspot.id);
+        renderAll();
+        initViewer(currentSceneId);
+        });
+
+        item.appendChild(remove);
+        hotspotList.appendChild(item);
+        });
+        }
+
+        function selectScene(id, refreshViewer) {
+        currentSceneId = id;
+        renderAll();
+
+        if (refreshViewer) {
+        initViewer(id);
+        }
+        }
+
+        function syncAdvancedSettings() {
+        const scene = getScene(currentSceneId);
+        const disabled = !scene;
+
+        [
+        startYawInput,
+        startPitchInput,
+        startZoomInput,
+        saveStartAdvancedBtn,
+        autoRotateCheck,
+        autoRotateSpeed
+        ].forEach(element => {
+        element.disabled = disabled;
+        });
+
+        if (!scene) {
+        startYawValue.textContent = "0";
+        startPitchValue.textContent = "0";
+        startZoomValue.textContent = "0";
+        autoRotateSpeedWrap.classList.remove("is-visible");
+        return;
+        }
+
+        ensureSceneAdvancedSettings(scene);
+
+        const zoomValue = hfovToZoomSlider(scene.start.hfov);
+
+        startYawInput.value = scene.start.yaw;
+        startPitchInput.value = scene.start.pitch;
+        startZoomInput.value = zoomValue;
+
+        startYawValue.textContent = scene.start.yaw;
+        startPitchValue.textContent = scene.start.pitch;
+        startZoomValue.textContent = zoomValue;
+
+        autoRotateCheck.checked = scene.autoRotate.enabled;
+        autoRotateSpeed.value = scene.autoRotate.speed;
+        autoRotateSpeedValue.textContent = scene.autoRotate.speed;
+
+        autoRotateSpeedWrap.classList.toggle("is-visible", scene.autoRotate.enabled);
+        }
+
+        function applyLiveStartSettings(updateViewer) {
+        const scene = getScene(currentSceneId);
+        if (!scene) return;
+
+        scene.start.yaw = roundNumber(clampNumber(startYawInput.value, -180, 180, 0));
+        scene.start.pitch = roundNumber(clampNumber(startPitchInput.value, -45, 45, 0));
+        scene.start.hfov = zoomSliderToHfov(startZoomInput.value);
+
+        startYawValue.textContent = scene.start.yaw;
+        startPitchValue.textContent = scene.start.pitch;
+        startZoomValue.textContent = startZoomInput.value;
+
+        if (updateViewer && viewer) {
+        viewer.setYaw(scene.start.yaw);
+        viewer.setPitch(scene.start.pitch);
+        viewer.setHfov(scene.start.hfov);
+        }
+        }
+
+        function saveCurrentViewAsSceneStart() {
+        const scene = getScene(currentSceneId);
+
+        if (!scene || !viewer) {
+        alert("Load a scene first.");
+        return;
+        }
+
+        scene.start.pitch = roundNumber(viewer.getPitch());
+        scene.start.yaw = roundNumber(viewer.getYaw());
+        scene.start.hfov = roundNumber(viewer.getHfov());
+
+        renderAll();
+        alert("Starting view saved for this scene.");
+        }
+
+        function updateSceneAutoRotate() {
+        const scene = getScene(currentSceneId);
+        if (!scene) return;
+
+        ensureSceneAdvancedSettings(scene);
+
+        const keepView = viewer ? {
+        pitch: viewer.getPitch(),
+        yaw: viewer.getYaw(),
+        hfov: viewer.getHfov()
+        } : {
+        pitch: scene.start.pitch,
+        yaw: scene.start.yaw,
+        hfov: scene.start.hfov
+        };
+
+        scene.autoRotate.enabled = autoRotateCheck.checked;
+        scene.autoRotate.speed = roundNumber(clampNumber(autoRotateSpeed.value, -10, 10, -3));
+
+        autoRotateSpeedValue.textContent = scene.autoRotate.speed;
+        autoRotateSpeedWrap.classList.toggle("is-visible", scene.autoRotate.enabled);
+
+        if (!viewer) return;
+
+        if (typeof viewer.stopAutoRotate === "function") {
+        viewer.stopAutoRotate();
+        }
+
+        viewer.setPitch(keepView.pitch);
+        viewer.setYaw(keepView.yaw);
+        viewer.setHfov(keepView.hfov);
+
+        if (scene.autoRotate.enabled && scene.autoRotate.speed !== 0) {
+        viewer.startAutoRotate(scene.autoRotate.speed, keepView.pitch);
+
+        requestAnimationFrame(() => {
+        viewer.setPitch(keepView.pitch);
+        viewer.setHfov(keepView.hfov);
+        });
+        }
+        }
+
+        function buildPannellumScenes() {
+        const config = {};
+
+        scenes.forEach(scene => {
+        ensureSceneAdvancedSettings(scene);
+
+        config[scene.id] = {
+        type: "equirectangular",
+        panorama: scene.url,
+        autoLoad: true,
+        showControls: true,
+        pitch: scene.start.pitch,
+        yaw: scene.start.yaw,
+        hfov: scene.start.hfov,
+        minHfov: 70,
+        maxHfov: 120,
+        autoRotate: 0,
+        hotSpots: scene.hotSpots.map(hotspot => {
+        const target = getScene(hotspot.targetId);
+
+        return {
+        pitch: hotspot.pitch,
+        yaw: hotspot.yaw,
+        type: "scene",
+        text: hotspot.text,
+        sceneId: hotspot.targetId,
+        targetPitch: target ? target.start.pitch : 0,
+        targetYaw: target ? target.start.yaw : 0,
+        targetHfov: target ? target.start.hfov : 100,
+        cssClass: "vc-tour-hotspot",
+        createTooltipFunc: setupEditableHotspot,
+        createTooltipArgs: {
+        id: hotspot.id,
+        text: hotspot.text
+        }
+        };
+        })
+        };
+        });
+
+        return config;
+        }
+
+        function setupEditableHotspot(hotSpotDiv, args) {
+        hotSpotDiv.dataset.hotspotId = args.id;
+        hotSpotDiv.setAttribute("title", args.text + " — drag to move");
+
+        hotSpotDiv.addEventListener("pointerdown", startHotspotDrag, true);
+
+        hotSpotDiv.addEventListener("click", function (event) {
+        if (suppressHotspotSceneClick) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        suppressHotspotSceneClick = false;
+        }
+        }, true);
+        }
+
+        function moveGhostHotspot(x, y) {
+        dragGhostHotspot.style.left = x + "px";
+        dragGhostHotspot.style.top = y + "px";
+        }
+
+        function showGhostHotspot(x, y) {
+        moveGhostHotspot(x, y);
+        dragGhostHotspot.classList.add("is-visible");
+        }
+
+        function hideGhostHotspot() {
+        dragGhostHotspot.classList.remove("is-visible");
+        }
+
+        function updateDraggedHotspotFromPointer(clientX, clientY) {
+        if (!draggingHotspot || !viewer) return;
+
+        const scene = getScene(draggingHotspot.sceneId);
+        if (!scene) return;
+
+        const hotspot = scene.hotSpots.find(item => item.id === draggingHotspot.hotspotId);
+        if (!hotspot) return;
+
+        const coords = viewer.mouseEventToCoords({
+        clientX,
+        clientY
+        });
+
+        if (!coords) return;
+
+        hotspot.pitch = roundNumber(coords[0]);
+        hotspot.yaw = roundNumber(coords[1]);
+        }
+
+        function startHotspotDrag(event) {
+        if (!viewer || event.button !== 0) return;
+
+        const hotSpotDiv = event.currentTarget;
+        const hotspotId = hotSpotDiv.dataset.hotspotId;
+        const scene = getScene(currentSceneId);
+
+        if (!scene) return;
+
+        const hotspot = scene.hotSpots.find(item => item.id === hotspotId);
+        if (!hotspot) return;
+
+        draggingHotspot = {
+        hotspotId,
+        sceneId: currentSceneId,
+        element: hotSpotDiv,
+        startX: event.clientX,
+        startY: event.clientY,
+        lastX: event.clientX,
+        lastY: event.clientY,
+        moved: false
+        };
+
+        try {
+        hotSpotDiv.setPointerCapture(event.pointerId);
+        } catch (error) {}
+
+        viewerFrame.classList.add("is-hotspot-dragging");
+        hotSpotDiv.classList.add("is-being-dragged");
+        showGhostHotspot(event.clientX, event.clientY);
+
+        window.addEventListener("pointermove", moveHotspotDrag, true);
+        window.addEventListener("pointerup", endHotspotDrag, true);
+
+        startEdgePanLoop();
+
+        event.preventDefault();
+        event.stopPropagation();
+        }
+
+        function moveHotspotDrag(event) {
+        if (!draggingHotspot || !viewer) return;
+
+        const moveX = Math.abs(event.clientX - draggingHotspot.startX);
+        const moveY = Math.abs(event.clientY - draggingHotspot.startY);
+
+        if (moveX > 4 || moveY > 4) {
+        draggingHotspot.moved = true;
+        }
+
+        draggingHotspot.lastX = event.clientX;
+        draggingHotspot.lastY = event.clientY;
+
+        moveGhostHotspot(event.clientX, event.clientY);
+        updateDraggedHotspotFromPointer(event.clientX, event.clientY);
+
+        event.preventDefault();
+        event.stopPropagation();
+        }
+
+        function getEdgePanSpeed() {
+        if (!draggingHotspot) return 0;
+
+        const rect = viewerFrame.getBoundingClientRect();
+        const edgeZone = 180;
+        const maxSpeed = 3.4;
+
+        let speed = 0;
+
+        if (draggingHotspot.lastX < rect.left + edgeZone) {
+        const strength = 1 - ((draggingHotspot.lastX - rect.left) / edgeZone);
+        speed = -maxSpeed * Math.max(0, Math.min(1, strength));
+        }
+
+        if (draggingHotspot.lastX > rect.right - edgeZone) {
+        const strength = 1 - ((rect.right - draggingHotspot.lastX) / edgeZone);
+        speed = maxSpeed * Math.max(0, Math.min(1, strength));
+        }
+
+        return speed;
+        }
+
+        function startEdgePanLoop() {
+        stopEdgePanLoop();
+
+        function loop() {
+        if (!draggingHotspot || !viewer) {
+        stopEdgePanLoop();
+        return;
+        }
+
+        const speed = getEdgePanSpeed();
+
+        if (speed !== 0) {
+        viewer.setYaw(viewer.getYaw() + speed);
+        updateDraggedHotspotFromPointer(draggingHotspot.lastX, draggingHotspot.lastY);
+        }
+
+        edgePanAnimation = requestAnimationFrame(loop);
+        }
+
+        edgePanAnimation = requestAnimationFrame(loop);
+        }
+
+        function stopEdgePanLoop() {
+        if (edgePanAnimation) {
+        cancelAnimationFrame(edgePanAnimation);
+        edgePanAnimation = null;
+        }
+        }
+
+        function endHotspotDrag(event) {
+        if (!draggingHotspot) return;
+
+        const moved = draggingHotspot.moved;
+        const sceneId = draggingHotspot.sceneId;
+
+        if (draggingHotspot.element) {
+        draggingHotspot.element.classList.remove("is-being-dragged");
+        }
+
+        viewerFrame.classList.remove("is-hotspot-dragging");
+        hideGhostHotspot();
+        stopEdgePanLoop();
+
+        window.removeEventListener("pointermove", moveHotspotDrag, true);
+        window.removeEventListener("pointerup", endHotspotDrag, true);
+
+        draggingHotspot = null;
+
+        if (moved) {
+        suppressHotspotSceneClick = true;
+        renderAll();
+        initViewer(sceneId);
+
+        setTimeout(() => {
+        suppressHotspotSceneClick = false;
+        }, 300);
+
+        event.preventDefault();
+        event.stopPropagation();
+        }
+        }
+
+        function initViewer(sceneId) {
+        if (!scenes.length) {
+        document.getElementById("tourPreview").innerHTML = `
+        <div class="empty-viewer">
+        <div>
+        <strong>No 360 image loaded yet</strong>
+        <p>Add one or more 360 images to start building your tour.</p>
+        </div>
+        </div>
+        `;
+        return;
+        }
+
+        if (viewer && typeof viewer.destroy === "function") {
+        viewer.destroy();
+        }
+
+        document.getElementById("tourPreview").innerHTML = "";
+
+        viewer = pannellum.viewer("tourPreview", {
+        default: {
+        firstScene: sceneId || scenes[0].id,
+        sceneFadeDuration: 320
+        },
+        scenes: buildPannellumScenes()
+        });
+
+        viewer.on("scenechange", function (id) {
+        currentSceneId = id;
+        renderAll();
+        });
+
+        updateCurrentViewText();
+        }
+
+        function updateCurrentViewText() {
+        const scene = getScene(currentSceneId);
+
+        if (!scene) {
+        currentViewText.textContent = "Current scene: none";
+        return;
+        }
+
+        currentViewText.textContent = "Current scene: " + scene.name;
+        }
+
+        function setPlacingMode(active) {
+        placingHotspot = active;
+        placingBanner.classList.toggle("is-visible", active);
+        placeHotspotBtn.textContent = active ? "Click inside preview" : "Place hotspot";
+        }
+
+        placeHotspotBtn.addEventListener("click", () => {
+        if (!currentSceneId || scenes.length < 2) {
+        alert("Add at least two 360 images before placing hotspots.");
+        return;
+        }
+
+        if (!targetScene.value) {
+        alert("Choose a target scene first.");
+        return;
+        }
+
+        setPlacingMode(true);
+        });
+
+        cancelPlaceBtn.addEventListener("click", () => {
+        setPlacingMode(false);
+        });
+
+        viewerFrame.addEventListener("click", event => {
+        if (!placingHotspot || !viewer) return;
+
+        const currentScene = getScene(currentSceneId);
+        const target = getScene(targetScene.value);
+
+        if (!currentScene || !target) return;
+
+        const coords = viewer.mouseEventToCoords(event);
+        if (!coords) return;
+
+        const label = hotspotLabel.value.trim() || "Go to " + target.name;
+
+        currentScene.hotSpots.push({
+        id: "hotspot-" + Date.now(),
+        pitch: roundNumber(coords[0]),
+        yaw: roundNumber(coords[1]),
+        text: label,
+        targetId: target.id
+        });
+
+        hotspotLabel.value = "";
+        setPlacingMode(false);
+        renderAll();
+        initViewer(currentSceneId);
+        }, true);
+
+        saveStartBtn.addEventListener("click", saveCurrentViewAsSceneStart);
+        saveStartAdvancedBtn.addEventListener("click", saveCurrentViewAsSceneStart);
+
+        startYawInput.addEventListener("input", () => {
+        applyLiveStartSettings(true);
+        });
+
+        startPitchInput.addEventListener("input", () => {
+        applyLiveStartSettings(true);
+        });
+
+        startZoomInput.addEventListener("input", () => {
+        applyLiveStartSettings(true);
+        });
+
+        autoRotateCheck.addEventListener("change", updateSceneAutoRotate);
+
+        autoRotateSpeed.addEventListener("input", () => {
+        autoRotateSpeedValue.textContent = autoRotateSpeed.value;
+        updateSceneAutoRotate();
+        });
+
+        autoRotateSpeed.addEventListener("change", updateSceneAutoRotate);
+
+        fileInput.addEventListener("change", event => {
+        handleFiles(event.target.files);
+        fileInput.value = "";
+        });
+
+        dropZone.addEventListener("click", () => {
+        fileInput.click();
+        });
+
+        dropZone.addEventListener("dragover", event => {
+        event.preventDefault();
+        dropZone.classList.add("is-dragging");
+        });
+
+        dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("is-dragging");
+        });
+
+        dropZone.addEventListener("drop", event => {
+        event.preventDefault();
+        dropZone.classList.remove("is-dragging");
+        handleFiles(event.dataTransfer.files);
+        });
+
+        clearBtn.addEventListener("click", () => {
+        if (!confirm("Clear this tour builder? This removes the current browser-only setup.")) return;
+
+        scenes.forEach(scene => URL.revokeObjectURL(scene.url));
+        scenes.length = 0;
+        sceneCounter = 1;
+        currentSceneId = null;
+        setPlacingMode(false);
+
+        if (viewer && typeof viewer.destroy === "function") {
+        viewer.destroy();
+        }
+
+        viewer = null;
+        renderAll();
+        initViewer(null);
+        });
+
+        exportBtn.addEventListener("click", async () => {
+        if (!scenes.length) {
+        alert("Add at least one 360 image first.");
+        return;
+        }
+
+        exportBtn.textContent = "Preparing file...";
+        exportBtn.disabled = true;
+
+        try {
+        await prepareDataUrls();
+
+        const exportData = {
+        firstSceneId: scenes[0].id,
+        scenes: scenes.map(scene => ({
+        id: scene.id,
+        name: scene.name,
+        panorama: scene.dataUrl,
+        start: scene.start,
+        autoRotate: scene.autoRotate || { enabled: false, speed: -3 },
+        hotSpots: scene.hotSpots
+        }))
+        };
+
+        const html = buildExportHtml(exportData);
+        downloadTextFile("visioncraft-360-tour.html", html);
+        } catch (error) {
+        alert("Export failed. Try using smaller images.");
+        console.error(error);
+        }
+
+        exportBtn.textContent = "Download tour HTML";
+        exportBtn.disabled = false;
+        });
+
+        function prepareDataUrls() {
+        return Promise.all(scenes.map(scene => {
+        if (scene.dataUrl) return Promise.resolve();
+
+        return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+        scene.dataUrl = reader.result;
+        resolve();
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(scene.file);
+        });
+        }));
+        }
+
+        function buildExportHtml(data) {
+        const safeData = JSON.stringify(data).replace(/</g, "\\u003c");
+
+        return `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>360 Tour | VisionCraft Design Studio</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css">
+        <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"><\/script>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+        :root {
+        --bg: #f3f1ed;
+        --surface: #fbfaf7;
+        --ink: #111111;
+        --muted: #6a6863;
+        }
+        * { box-sizing: border-box; }
+        html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        font-family: Inter, Arial, sans-serif;
+        color: var(--ink);
+        }
+        .tour-shell {
+        width: 100%;
+        height: 100vh;
+        padding: 10px;
+        display: grid;
+        gap: 10px;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        overflow: hidden;
+        }
+        .tour-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        background: rgba(251,250,247,0.94);
+        border: 1px solid rgba(17,17,17,0.08);
+        border-radius: 18px;
+        padding: 10px 14px;
+        }
+        .brand-mark { display: grid; gap: 2px; }
+        .brand-mark strong {
+        font-family: "DM Serif Display", Georgia, serif;
+        font-size: 1.25rem;
+        font-weight: 400;
+        }
+        .brand-mark span,
+        .brand-contact {
+        color: var(--muted);
+        font-size: 0.8rem;
+        }
+        .brand-contact {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        margin-top: 4px;
+        }
+        .brand-contact a { color: inherit; text-decoration: none; }
+        .scene-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        }
+        .scene-buttons button {
+        border: 1px solid rgba(17,17,17,0.16);
+        border-radius: 999px;
+        background: transparent;
+        padding: 8px 12px;
+        cursor: pointer;
+        font: inherit;
+        }
+        .scene-buttons button.is-active {
+        background: var(--ink);
+        color: #fff;
+        }
+        .viewer-wrap {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        border-radius: 24px;
+        overflow: hidden;
+        background: #b4aea6;
+        box-shadow: 0 20px 48px rgba(0,0,0,0.12);
+        }
+        #viewer {
+        position: absolute;
+        inset: 0;
+        }
+        .tour-controls {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: rgba(251,250,247,0.94);
+        border: 1px solid rgba(17,17,17,0.08);
+        border-radius: 16px;
+        padding: 8px 12px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        align-items: center;
+        }
+        .tour-controls a {
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 700;
+        }
+        .control-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        }
+        .control-buttons button {
+        min-height: 38px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(17,17,17,0.16);
+        background: var(--ink);
+        color: #fff;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+        }
+        .control-buttons button.secondary {
+        background: transparent;
+        color: var(--ink);
+        }
+        .pnlm-hotspot-base.vc-tour-hotspot {
+        width: 46px !important;
+        height: 46px !important;
+        border-radius: 999px;
+        background: rgba(251, 250, 247, 0.92) !important;
+        background-image: none !important;
+        border: 1px solid rgba(17,17,17,0.14);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+        }
+        .pnlm-hotspot-base.vc-tour-hotspot::before {
+        content: "";
+        position: absolute;
+        inset: 13px;
+        border-radius: 999px;
+        background: #111111;
+        }
+        @media (max-width: 760px) {
+        .tour-header { align-items: flex-start; flex-direction: column; }
+        .scene-buttons { justify-content: flex-start; }
+        .viewer-wrap { min-height: 0; height: 100%; border-radius: 18px; }
+        }
+        </style>
+        </head>
+        <body>
+        <div class="tour-shell">
+        <header class="tour-header">
+        <div class="brand-mark">
+        <strong>360 Tour</strong>
+        <span>Created with VisionCraft Design Studio</span>
+        <div class="brand-contact">
+        <a href="https://visioncraft.uk" target="_blank" rel="noopener">visioncraft.uk</a>
+        <a href="mailto:hello@visioncraft.uk">hello@visioncraft.uk</a>
+        <a href="tel:+447931396221">+44 7931 396221</a>
+        </div>
+        </div>
+        <div class="scene-buttons" id="sceneButtons"></div>
+        </header>
+
+        <main class="viewer-wrap">
+        <div id="viewer"></div>
+        </main>
+
+        <footer class="tour-controls">
+        <span>Created with <strong>VisionCraft Design Studio</strong> · <a href="https://visioncraft.uk" target="_blank" rel="noopener">visioncraft.uk</a></span>
+        <div class="control-buttons">
+        <button type="button" id="autoRotateToggle">Pause rotation</button>
+        <button type="button" class="secondary" id="resetViewBtn">Reset view</button>
+        </div>
+        </footer>
+        </div>
+
+        <script>
+        const tourData = ${safeData};
+        let viewer;
+        let activeScene = tourData.firstSceneId;
+        let rotationEnabled = true;
+        let idleTimer = null;
+        const idleDelay = 5000;
+
+        const viewerElement = document.getElementById("viewer");
+        const autoRotateToggle = document.getElementById("autoRotateToggle");
+        const resetViewBtn = document.getElementById("resetViewBtn");
+
+        function getScene(id) {
+        return tourData.scenes.find(scene => scene.id === id);
+        }
+
+        function getSceneAutoSpeed(scene) {
+        if (!scene || !scene.autoRotate || !scene.autoRotate.enabled) return 0;
+        return Number(scene.autoRotate.speed) || 0;
+        }
+
+        function buildScenes() {
+        const config = {};
+
+        tourData.scenes.forEach(scene => {
+        config[scene.id] = {
+        type: "equirectangular",
+        panorama: scene.panorama,
+        autoLoad: true,
+        showControls: true,
+        pitch: scene.start.pitch,
+        yaw: scene.start.yaw,
+        hfov: scene.start.hfov,
+        minHfov: 70,
+        maxHfov: 120,
+        autoRotate: 0,
+        hotSpots: scene.hotSpots.map(hotspot => {
+        const target = getScene(hotspot.targetId);
+
+        return {
+        pitch: hotspot.pitch,
+        yaw: hotspot.yaw,
+        type: "scene",
+        text: hotspot.text,
+        sceneId: hotspot.targetId,
+        targetPitch: target ? target.start.pitch : 0,
+        targetYaw: target ? target.start.yaw : 0,
+        targetHfov: target ? target.start.hfov : 100,
+        cssClass: "vc-tour-hotspot"
+        };
+        })
+        };
+        });
+
+        return config;
+        }
+
+        function renderSceneButtons() {
+        const wrap = document.getElementById("sceneButtons");
+        wrap.innerHTML = "";
+
+        tourData.scenes.forEach(scene => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = scene.name;
+        button.className = scene.id === activeScene ? "is-active" : "";
+
+        button.onclick = () => {
+        activeScene = scene.id;
+        const target = getScene(activeScene);
+
+        viewer.loadScene(activeScene, target.start.pitch, target.start.yaw, target.start.hfov);
+        renderSceneButtons();
+        updateRotationButton();
+
+        setTimeout(startRotationForActiveScene, 500);
+        };
+
+        wrap.appendChild(button);
+        });
+        }
+
+        function stopRotation() {
+        if (viewer && typeof viewer.stopAutoRotate === "function") {
+        viewer.stopAutoRotate();
+        }
+        }
+
+        function startRotationForActiveScene() {
+        const scene = getScene(activeScene);
+        const speed = getSceneAutoSpeed(scene);
+
+        if (!viewer || !rotationEnabled || speed === 0) {
+        stopRotation();
+        updateRotationButton();
+        return;
+        }
+
+        const keepPitch = viewer.getPitch();
+        const keepHfov = viewer.getHfov();
+
+        viewer.startAutoRotate(speed, keepPitch);
+
+        requestAnimationFrame(() => {
+        viewer.setPitch(keepPitch);
+        viewer.setHfov(keepHfov);
+        });
+
+        updateRotationButton();
+        }
+
+        function resetToStart(shouldRotateAfter) {
+        const scene = getScene(activeScene);
+        if (!scene || !viewer) return;
+
+        viewer.setPitch(scene.start.pitch);
+        viewer.setYaw(scene.start.yaw);
+        viewer.setHfov(scene.start.hfov);
+
+        if (shouldRotateAfter) {
+        setTimeout(startRotationForActiveScene, 250);
+        }
+        }
+
+        function scheduleReturnToStart() {
+        clearTimeout(idleTimer);
+
+        const wasRotating = rotationEnabled;
+
+        if (wasRotating) {
+        stopRotation();
+        }
+
+        idleTimer = setTimeout(() => {
+        const scene = getScene(activeScene);
+        if (!scene || !viewer) return;
+
+        const keepPitch = viewer.getPitch();
+        const keepYaw = viewer.getYaw();
+
+        viewer.setPitch(keepPitch);
+        viewer.setYaw(keepYaw);
+        viewer.setHfov(scene.start.hfov);
+
+        if (wasRotating) {
+        setTimeout(startRotationForActiveScene, 250);
+        }
+        }, idleDelay);
+        }
+
+        function updateRotationButton() {
+        const scene = getScene(activeScene);
+        const speed = getSceneAutoSpeed(scene);
+
+        if (speed === 0) {
+        autoRotateToggle.textContent = "Rotation off";
+        autoRotateToggle.disabled = true;
+        return;
+        }
+
+        autoRotateToggle.disabled = false;
+        autoRotateToggle.textContent = rotationEnabled ? "Pause rotation" : "Resume rotation";
+        }
+
+        viewer = pannellum.viewer("viewer", {
+        default: {
+        firstScene: tourData.firstSceneId,
+        sceneFadeDuration: 320
+        },
+        scenes: buildScenes()
+        });
+
+        viewer.on("scenechange", id => {
+        activeScene = id;
+        renderSceneButtons();
+        updateRotationButton();
+        clearTimeout(idleTimer);
+        setTimeout(startRotationForActiveScene, 500);
+        });
+
+        ["pointerdown", "wheel", "touchstart"].forEach(eventName => {
+        viewerElement.addEventListener(eventName, scheduleReturnToStart, { passive: true });
+        });
+
+        autoRotateToggle.addEventListener("click", () => {
+        rotationEnabled = !rotationEnabled;
+        clearTimeout(idleTimer);
+
+        if (rotationEnabled) {
+        startRotationForActiveScene();
+        } else {
+        stopRotation();
+        }
+
+        updateRotationButton();
+        });
+
+        resetViewBtn.addEventListener("click", () => {
+        resetToStart(rotationEnabled);
+        });
+
+        renderSceneButtons();
+        updateRotationButton();
+        setTimeout(startRotationForActiveScene, 700);
+        <\/script>
+        </body>
+        </html>`;
+        }
+
+        function downloadTextFile(filename, text) {
+        const blob = new Blob([text], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = filename;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(url);
+        }
+
+        function escapeHtml(text) {
+        return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+        }
+
+        renderAll();
+    </script>
+</body>
+</html>
