@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>VisionCraft Design Studio - Stereo Cubemap Viewer</title>
+  <meta
+    name="description"
+    content="Premium WebXR stereo cubemap viewer for Meta Quest 3 by VisionCraft Design Studio."
+  >
+  <link rel="stylesheet" href="./style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.166.1/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.166.1/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="side-panel">
+      <div class="brand-block panel-card">
+        <img src="logo.png" alt="VisionCraft Design Studio" class="brand-logo">
+        <h1>Stereo Cubemap Viewer</h1>
+        <p class="tagline">Immersive VR Visualisation for Interior and Architectural Spaces</p>
+        <div class="brand-actions">
+          <button id="enterVrButton" class="primary-button">Enter VR</button>
+          <button id="resetViewButton" class="secondary-button">Reset View</button>
+        </div>
+      </div>
+
+      <section class="panel-card panel-stack">
+        <div class="panel-header">
+          <div>
+            <p class="panel-label">Home</p>
+            <h2>Upload Stereo Cubemap</h2>
+          </div>
+          <span class="status-pill" id="imageStatusPill">Demo Scene Active</span>
+        </div>
+
+        <label class="field-label" for="sceneNameInput">Scene Name</label>
+        <input id="sceneNameInput" class="text-input" type="text" placeholder="Penthouse Lobby - Evening">
+
+        <label class="field-label" for="sceneFileInput">Stereo Cubemap Image</label>
+        <input
+          id="sceneFileInput"
+          class="file-input"
+          type="file"
+          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+        >
+
+        <div class="inline-actions">
+          <button id="uploadSceneButton" class="primary-button">Upload Scene</button>
+          <button id="loadDemoButton" class="secondary-button">Load Demo</button>
+        </div>
+
+        <div class="info-box">
+          <p class="info-title">Expected Format</p>
+          <p>
+            One top-bottom stereo cubemap strip. Top half is the left eye, bottom half is the right eye.
+            Each half must be a 6x1 strip of square faces.
+          </p>
+          <p class="mono">
+            Example: <code>18432 x 6144</code> -> two rows of <code>18432 x 3072</code>, face size <code>3072 x 3072</code>.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel-card panel-stack">
+        <div class="panel-header">
+          <div>
+            <p class="panel-label">Scene Library</p>
+            <h2>Stored Locally</h2>
+          </div>
+          <button id="refreshScenesButton" class="icon-button" title="Refresh scene list">Refresh</button>
+        </div>
+        <p class="panel-note">If old scenes still look wrong, delete them from the local scene library and upload again.</p>
+        <div id="sceneLibraryList" class="scene-list"></div>
+      </section>
+
+      <section class="panel-card panel-stack">
+        <div class="panel-header">
+          <div>
+            <p class="panel-label">Viewer</p>
+            <h2>Client Controls</h2>
+          </div>
+        </div>
+
+        <div class="control-grid">
+          <button id="previousSceneFaceButton" class="secondary-button">Previous Image</button>
+          <button id="nextSceneFaceButton" class="secondary-button">Next Image</button>
+          <button id="swapEyesButton" class="secondary-button">Swap Left / Right Eyes</button>
+          <button id="rotate90Button" class="secondary-button">Rotate View 90&deg;</button>
+          <button id="rotate180Button" class="secondary-button">Rotate View 180&deg;</button>
+          <button id="viewerResetButton" class="secondary-button">Reset View</button>
+        </div>
+
+        <label class="field-label" for="previewEyeSelect">Desktop / Mobile Preview</label>
+        <select id="previewEyeSelect" class="select-input">
+          <option value="left">Left Eye</option>
+          <option value="right">Right Eye</option>
+          <option value="stereo">Stereo Overlay</option>
+        </select>
+      </section>
+
+      <section class="panel-card panel-stack">
+        <div class="panel-header">
+          <div>
+            <p class="panel-label">Advanced Cubemap Correction</p>
+            <h2>Face Order &amp; Rotation</h2>
+          </div>
+        </div>
+
+        <label class="field-label" for="presetSelect">Face Order Preset</label>
+        <div class="inline-actions">
+          <select id="presetSelect" class="select-input grow"></select>
+          <button id="applyPresetButton" class="secondary-button">Apply</button>
+        </div>
+
+        <div id="faceConfigGrid" class="face-config-grid"></div>
+      </section>
+
+      <section class="panel-card panel-stack">
+        <div class="panel-header">
+          <div>
+            <p class="panel-label">VR Instructions</p>
+            <h2>Quest 3 Usage</h2>
+          </div>
+        </div>
+        <ul class="instruction-list">
+          <li>Open this app in Meta Quest Browser over HTTPS or localhost.</li>
+          <li>Upload a stereo cubemap strip or use the demo placeholder.</li>
+          <li>Press <span class="mono">Enter VR</span> and allow immersive mode.</li>
+          <li>Press <span class="mono">B</span> on the right Quest controller to show or hide the floating VR menu.</li>
+          <li>Use the right controller trigger to click the floating VR menu when it is visible.</li>
+          <li>Hold trigger away from the menu, or hold grip, then drag left/right to rotate the stereo cubemap.</li>
+        </ul>
+      </section>
+    </aside>
+
+    <main class="viewer-stage">
+      <div class="viewer-frame">
+        <div class="viewer-hud">
+          <div class="panel-card hud-card">
+            <p class="panel-label">Current Scene</p>
+            <h3 id="currentSceneName">Demo Lobby</h3>
+            <p id="currentSceneMeta" class="hud-meta">Generated demo stereo cubemap</p>
+          </div>
+          <div class="panel-card hud-card">
+            <p class="panel-label">Render State</p>
+            <h3 id="renderState">Desktop Preview</h3>
+            <p id="renderStateMeta" class="hud-meta">Previewing left eye cubemap</p>
+          </div>
+        </div>
+
+        <div id="webglRoot" class="webgl-root"></div>
+
+        <div id="messageTray" class="message-tray" aria-live="polite"></div>
+
+        <div id="errorBanner" class="error-banner hidden" role="alert"></div>
+      </div>
+    </main>
+  </div>
+
+  <template id="sceneCardTemplate">
+    <article class="scene-card">
+      <div class="scene-card-copy">
+        <h3 class="scene-card-title"></h3>
+        <p class="scene-card-meta"></p>
+      </div>
+      <div class="scene-card-actions">
+        <button class="secondary-button load-scene-button">Load</button>
+        <button class="secondary-button delete-scene-button">Delete</button>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
